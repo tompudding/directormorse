@@ -6,7 +6,7 @@ import game_view
 import globals
 from globals.types import Point
 
-def main(m):
+def main(send,recv):
     #We musn't initialise pygame until after our sound generator has run, otherwise it can't see the audio device
     import pygame
     import pygame.locals
@@ -62,7 +62,7 @@ def main(m):
 
     Init()
 
-    globals.current_view = globals.game_view = game_view.GameView(m)
+    globals.current_view = globals.game_view = game_view.GameView(send,recv)
 
     done = False
     last = 0
@@ -133,5 +133,5 @@ def main(m):
                         if handled:
                             break
 
-with morse.SoundMorse() as m:
-    main(m)
+with morse.SoundMorse() as send, morse.SoundMorse(800) as recv:
+    main(send,recv)

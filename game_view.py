@@ -337,8 +337,10 @@ class TimeOfDay(object):
 
 
 class GameView(ui.RootElement):
-    def __init__(self, morse):
-        self.morse = morse
+    def __init__(self, send_morse, recv_morse):
+        self.morse = send_morse
+        self.recv_morse = recv_morse
+        self.recv_morse.play('Monkey face')
         self.atlas = globals.atlas = drawing.texture.TextureAtlas('tiles_atlas_0.png','tiles_atlas.txt')
         self.enemies = []
         globals.ui_atlas = drawing.texture.TextureAtlas('ui_atlas_0.png','ui_atlas.txt',extra_names=False)
@@ -449,19 +451,19 @@ class GameView(ui.RootElement):
                                       pos = Point(0,0),
                                       tr = Point(1,0.4))
         self.morse.create_key(self.morse_key, self.text_colour)
+        self.morse.register_light(self.send_morse_light)
+        self.recv_morse.register_light(self.receive_morse_light)
 
         for pos in self.enemy_positions:
             self.enemies.append( actors.Enemy( self.map, pos ) )
 
     def morse_key_down(self):
         self.morse.key_down(globals.time)
-        self.send_morse_light.TurnOn()
         if self.map.current_robot:
             self.map.current_robot.morse_key_down()
 
     def morse_key_up(self):
         self.morse.key_up(globals.time)
-        self.send_morse_light.TurnOff()
         if self.map.current_robot:
             self.map.current_robot.morse_key_up()
 
@@ -488,6 +490,7 @@ class GameView(ui.RootElement):
         if self.game_over:
             return
         letter = self.morse.update(t)
+        self.recv_morse.update(t)
         if letter == True: #This indicates the end of a command
             print ''.join(self.command)
             self.command = []

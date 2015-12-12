@@ -72,10 +72,10 @@ class Player(object):
             else:
                 self.playing = True if command == '1' else False
 
-    def run(self, conn):
+    def run(self, conn, freq):
         import sounddevice as sd
         import generate
-        self.tone = generate.GenerateTone(freq=700, vol=1.0/400000)
+        self.tone = generate.GenerateTone(freq=freq, vol=1.0/400000)
         self.playing = False
         self.running = True
         self.pos = 0
@@ -106,18 +106,24 @@ class Morse(object):
         self.play_sequence = []
         self.letter_bar = None
         self.word_bar = None
+        self.light = None
 
     def register_bars(self, letter_bar, word_bar):
         self.letter_bar = letter_bar
         self.word_bar = word_bar
 
+    def register_light(self, light):
+        self.light = light
+
     def key_down(self, t):
         self.last_on = t
         self.set_letter_bar(1)
+        self.light.TurnOn()
 
     def key_up(self, t):
         if self.last_on is None:
             return
+        self.light.TurnOff()
         duration = t - self.last_on
         self.on_times.append( (self.last_on, duration) )
         if duration < self.DOT_TIME:
@@ -171,7 +177,7 @@ class Morse(object):
 
     def update(self, t):
         if self.playback(t):
-            self.letter_bar.SetBarLevel(0)
+            self.set_letter_bar(0)
             self.set_word_bar(0)
             return
 
@@ -235,10 +241,15 @@ class Morse(object):
 
 
 class SoundMorse(Morse):
+
+    def __init__(self, freq=700):
+        super(SoundMorse,self).__init__()
+        self.freq = freq
+
     def __enter__(self):
         self.parent_conn, self.child_conn = multiprocessing.Pipe()
         self.player = Player()
-        self.t = multiprocessing.Process(target=self.player.run, args=(self.child_conn, ))
+        self.t = multiprocessing.Process(target=self.player.run, args=(self.child_conn, self.freq))
         self.t.start()
         return self
 
