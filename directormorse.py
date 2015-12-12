@@ -1,6 +1,6 @@
 import os, sys
 import morse
-
+import globals
 
 def main(m):
     import pygame
@@ -16,9 +16,11 @@ def main(m):
     clock = pygame.time.Clock()
     clock.tick(60)
 
+    m.play('jimbob')
+
     playing = False
     while True:
-        t = pygame.time.get_ticks()
+        globals.time = t = pygame.time.get_ticks()
         m.update(t)
         for event in pygame.event.get():
             if event.type == pygame.locals.QUIT:
