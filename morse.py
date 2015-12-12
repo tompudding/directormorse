@@ -216,10 +216,11 @@ class Morse(object):
         alpha_0 = alphabet[:18][::-1]
         alpha_1 = alphabet[18:][::-1]
         elem.text_items = []
-        margin_height = 0.05
+        margin_height = 0.02
         margin_width  = 0.02
         height = (1.0-2*margin_height)/18
         width  = (1.0-2*margin_width)/2
+        elem.border = ui.Border(elem,Point(0,0),Point(1,1),colour=colour,line_width=2)
         for i,alpha in enumerate((alpha_0,alpha_1)):
             for j in xrange(18):
                 x = margin_width+i*width

@@ -1135,6 +1135,51 @@ class ToggleBox(ImageBox):
     def TurnOff(self):
         self.quad.SetTextureCoordinates(self.off_tc)
 
+class Border(UIElement):
+    def __init__(self,parent,pos,tr,colour,line_width=1,buffer=None):
+        if buffer is None:
+            buffer = globals.ui_buffer
+        super(Border,self).__init__(parent,pos,tr)
+        self.border = drawing.QuadBorder(buffer,line_width=line_width)
+        self.colour = colour
+        self.border.SetColour(colour)
+        self.border.SetColour(self.colour)
+        self.border.SetVertices(self.absolute.bottom_left,
+                                self.absolute.top_right)
+        self.Enable()
+
+    def UpdatePosition(self):
+        super(Border,self).UpdatePosition()
+        self.border.SetVertices(self.absolute.bottom_left,
+                                self.absolute.top_right)
+
+    def Delete(self):
+        super(Border,self).Delete()
+        self.border.Delete()
+
+    def Disable(self):
+        if self.enabled:
+            self.border.Disable()
+        super(Border,self).Disable()
+
+
+    def Enable(self):
+        if not self.enabled:
+            self.border.Enable()
+        super(Border,self).Enable()
+
+    def SetColour(self,colour):
+        self.colour = colour
+        self.border.SetColour(self.colour)
+
+    def MakeSelectable(self):
+        super(Border,self).MakeSelectable()
+        self.border.SetColour(self.colour)
+
+    def MakeUnselectable(self):
+        super(Border,self).MakeUnselectable()
+        self.border.SetColour(self.unselectable_colour)
+
 
 class ListBox(UIElement):
     def __init__(self,parent,bl,tr,text_size,items):
