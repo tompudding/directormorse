@@ -66,7 +66,7 @@ def GenerateTone( freq=480.0, vol=1.0, wave='sine', random=False,
         else:
             octave = int(freq[i: ])
         freq = 2.0 ** (log440 + notes_dct[note] / 12.0 + octave - 4)
-    vol = np.clip(vol, 0.0, 1.0)
+    #vol = np.clip(vol, 0.0, 1.0)
 
     if random:
         # Modulate frequency randomly, playing in previous mode selected.
@@ -90,8 +90,7 @@ def GenerateTone( freq=480.0, vol=1.0, wave='sine', random=False,
 
     # If mixer is in stereo mode, double up the array information for
     # each channel.
-
-    snd_ary = (ary * vol * float((1 << 15) - 1)).astype(np.int16)
+    snd_ary = (ary * vol * float((1 << 15) - 1))
+    #snd_ary = (snd_ary * vol).astype(np.int16)
     snd_ary = np.tile(snd_ary, 40)
-    print len(snd_ary)
-    return snd_ary.astype(np.int16)
+    return snd_ary.astype(np.float16)

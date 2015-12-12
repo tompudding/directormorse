@@ -35,7 +35,7 @@ class Player(object):
     def run(self, conn):
         import sounddevice as sd
         import generate
-        self.tone = generate.GenerateTone()
+        self.tone = generate.GenerateTone(freq=700, vol=1.0/100000)
         self.playing = False
         self.running = True
         self.pos = 0
@@ -61,9 +61,6 @@ pygame.key.set_repeat(500,50)
 screen = pygame.display.set_mode((width, height))
 import pygame.mixer
 
-pygame.mixer.init()
-pygame.mixer.music.load('music.ogg')
-pygame.mixer.music.play(-1)
 
 while 1:
     for event in pygame.event.get():
