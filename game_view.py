@@ -370,7 +370,7 @@ class GameView(ui.RootElement):
         #self.fixed_light = actors.FixedLight( Point(11,38),Point(26,9) )
         self.bottom_panel = ui.Box(parent = globals.screen_root,
                              pos = Point(0,0.0),
-                             tr = Point(0.8,0.08),
+                             tr = Point(1,0.08),
                              colour = (0,0,0,0.8))
         self.transmission = ui.TextBox(parent = self.bottom_panel,
                                       bl = Point(0,0),
@@ -380,26 +380,33 @@ class GameView(ui.RootElement):
                                       colour = (0,1,0,1))
         self.morse_entry = ui.TextBox(parent = self.bottom_panel,
                                       bl = Point(0.08,0),
-                                      tr = Point(0.45,0.7),
+                                      tr = Point(0.35,0.7),
                                       text = ' ',
                                       scale = 10,
                                       colour = (0,1,0,1))
         self.command_text = ui.TextBox(parent = self.bottom_panel,
-                                       bl = Point(0.45,0),
-                                       tr = Point(1,0.7),
+                                       bl = Point(0.35,0),
+                                       tr = Point(0.7,0.7),
                                        text = self.command_stub,
                                        scale = 10,
                                        colour = (0,1,0,1))
 
-        self.morse_light = ui.ToggleBox(parent = self.bottom_panel,
-                                             pos = Point(0.96,0),
-                                             tr = Point(1,1),
+        self.send_morse_light = ui.ToggleBox(parent = self.bottom_panel,
+                                             pos = Point(0.71,0),
+                                             tr = Point(0.75,1),
                                              on_tc = globals.ui_atlas.TextureUiCoords('light_on.png'),
                                              off_tc = globals.ui_atlas.TextureUiCoords('light_off.png'),
                                              buffer=globals.screen_texture_buffer)
 
+        self.receive_morse_light = ui.ToggleBox(parent = self.bottom_panel,
+                                             pos = Point(0.75,0),
+                                             tr = Point(0.79,1),
+                                             on_tc = globals.ui_atlas.TextureUiCoords('red_light_on.png'),
+                                             off_tc = globals.ui_atlas.TextureUiCoords('light_off.png'),
+                                             buffer=globals.screen_texture_buffer)
+
         self.robot_info = ui.Box(parent = globals.screen_root,
-                                 pos = Point(0.8,0),
+                                 pos = Point(0.8,0.08),
                                  tr = Point(1,1),
                                  colour = (0,0,0,0.8))
 
@@ -408,13 +415,13 @@ class GameView(ui.RootElement):
 
     def morse_key_down(self):
         self.morse.key_down(globals.time)
-        self.morse_light.TurnOn()
+        self.send_morse_light.TurnOn()
         if self.map.current_robot:
             self.map.current_robot.morse_key_down()
 
     def morse_key_up(self):
         self.morse.key_up(globals.time)
-        self.morse_light.TurnOff()
+        self.send_morse_light.TurnOff()
         if self.map.current_robot:
             self.map.current_robot.morse_key_up()
 
