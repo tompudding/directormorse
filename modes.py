@@ -110,7 +110,7 @@ class GameMode(Mode):
                 self.keydownmap[self.keyflags[key]] = input_key
                 self.parent.map.current_robot.move_direction += self.direction_amounts[key]
         else:
-            self.parent.map.current_robot.morse_key_down()
+            self.parent.morse_key_down()
 
     def KeyUp(self,input_key):
         key = input_key
@@ -123,8 +123,8 @@ class GameMode(Mode):
             elif key in self.direction_amounts and (self.keydownmap[self.keyflags[key]] == input_key):
                 del self.keydownmap[self.keyflags[key]]
                 self.parent.map.current_robot.move_direction -= self.direction_amounts[key]
-
-        self.parent.map.current_robot.morse_key_up()
+        else:
+            self.parent.morse_key_up()
 
     def MouseButtonDown(self,pos,button):
         self.parent.map.current_robot.click(pos,button)

@@ -173,22 +173,22 @@ class Morse(object):
 
 class SoundMorse(Morse):
     def __enter__(self):
-        # self.parent_conn, self.child_conn = multiprocessing.Pipe()
-        # self.player = Player()
-        # self.t = multiprocessing.Process(target=self.player.run, args=(self.child_conn, ))
-        # self.t.start()
+        self.parent_conn, self.child_conn = multiprocessing.Pipe()
+        self.player = Player()
+        self.t = multiprocessing.Process(target=self.player.run, args=(self.child_conn, ))
+        self.t.start()
         return self
 
     def key_down(self, t):
-        # self.parent_conn.send('1')
+        self.parent_conn.send('1')
         super(SoundMorse, self).key_down(t)
 
     def key_up(self, t):
-        # self.parent_conn.send('0')
+        self.parent_conn.send('0')
         super(SoundMorse, self).key_up(t)
 
     def __exit__(self, type, value, traceback):
-        # self.parent_conn.send('d')
-        # self.t.join()
+        self.parent_conn.send('d')
+        self.t.join()
         pass
 

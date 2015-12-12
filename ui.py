@@ -301,7 +301,7 @@ class UIRoot(RootElement):
             item.Draw()
 
         drawing.ResetState()
-        #drawing.DrawAll(globals.screen_texture_buffer,globals.ui_atlas.texture)
+        drawing.DrawAll(globals.screen_texture_buffer,globals.ui_atlas.texture)
 
     def Update(self,t):
         #Would it be faster to make a list of items to remove and then remove them, rather than build a new list?
@@ -1083,6 +1083,55 @@ class Slider(UIElement):
             return
         self.SetPointer()
         self.callback(self.index)
+
+class ImageBox(Box):
+    def __init__(self,parent,pos,tr,tc,buffer=None,level = None):
+        super(Box,self).__init__(parent,pos,tr)
+        if buffer == None:
+            buffer = globals.ui_texture_buffer
+
+        self.quad = drawing.Quad(buffer)
+        self.tc = tc
+        self.extra_level = 0 if level == None else level
+        self.quad.SetVertices(self.absolute.bottom_left,
+                              self.absolute.top_right,
+                              self.level + self.extra_level)
+        self.quad.SetTextureCoordinates(self.tc)
+        self.Enable()
+
+    def ResizeImage(self,new_size):
+        """The image currently takes up the whole box. Resize it to take up the new amounts"""
+        abs_size = new_size * self.absolute.size
+        offset = (self.absolute.size-abs_size)/2.0
+        self.quad.SetVertices(self.absolute.bottom_left + offset,
+                              self.absolute.top_right - offset,
+                              self.level + self.extra_level)
+
+class ToggleBox(ImageBox):
+    def __init__(self,parent,pos,tr,on_tc,off_tc,buffer=None,level=None):
+        super(ToggleBox,self).__init__(parent,pos,tr,off_tc,buffer,level)
+        self.off_tc = off_tc
+        self.on_tc = on_tc
+        self.on = False
+
+    def Toggle(state=None):
+        if state is None:
+            #Just toggle
+            if self.on:
+                self.TurnOff()
+            else:
+                self.TurnOn()
+        elif state:
+            self.TurnOn()
+        else:
+            self.TurnOff()
+
+    def TurnOn(self):
+        self.quad.SetTextureCoordinates(self.on_tc)
+
+    def TurnOff(self):
+        self.quad.SetTextureCoordinates(self.off_tc)
+
 
 class ListBox(UIElement):
     def __init__(self,parent,bl,tr,text_size,items):

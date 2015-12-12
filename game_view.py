@@ -7,7 +7,6 @@ import modes
 import random
 import actors
 
-
 class Viewpos(object):
     follow_threshold = 0
     max_away = Point(100,20)
@@ -342,7 +341,7 @@ class GameView(ui.RootElement):
         self.morse = morse
         self.atlas = globals.atlas = drawing.texture.TextureAtlas('tiles_atlas_0.png','tiles_atlas.txt')
         self.enemies = []
-        #globals.ui_atlas = drawing.texture.TextureAtlas('ui_atlas_0.png','ui_atlas.txt',extra_names=False)
+        globals.ui_atlas = drawing.texture.TextureAtlas('ui_atlas_0.png','ui_atlas.txt',extra_names=False)
         self.enemy_positions = []
         self.map = GameMap('level1.txt',self)
         self.map.world_size = self.map.size * globals.tile_dimensions
@@ -366,31 +365,45 @@ class GameView(ui.RootElement):
         self.timeofday = TimeOfDay(0.33)
         #self.mode = modes.LevelOne(self)
         self.StartMusic()
-        self.fixed_light = actors.FixedLight( Point(11,38),Point(26,9) )
-        self.interact_box = ui.Box(parent = globals.screen_root,
-                                   pos = Point(0.3,0.0),
-                                   tr = Point(0.5,0.08),
-                                   colour = (0.5,0.5,0.5,0.7))
-        self.interact_box.title = ui.TextBox(self.interact_box,
-                                             bl = Point(0,0),
+        #self.fixed_light = actors.FixedLight( Point(11,38),Point(26,9) )
+        self.bottom_panel = ui.Box(parent = globals.screen_root,
+                             pos = Point(0,0.0),
+                             tr = Point(0.8,0.08),
+                             colour = (0,0,0,0.8))
+        self.morse_entry = ui.TextBox(parent = self.bottom_panel,
+                                      bl = Point(0,0),
+                                      tr = Point(0.5,0.8),
+                                      text = 'monkey',
+                                      scale = 12,
+                                      colour = (0,1,0,1))
+
+        self.morse_light = ui.ToggleBox(parent = self.bottom_panel,
+                                             pos = Point(0.96,0),
                                              tr = Point(1,1),
-                                             text = 'Opening...',
-                                             textType = drawing.texture.TextTypes.SCREEN_RELATIVE,
-                                             colour = (0,0,0,1),
-                                             scale = 9,
-                                             alignment = drawing.texture.TextAlignments.CENTRE)
-        self.interact_box.progress = ui.PowerBar(self.interact_box,
-                                                 pos = Point(0.1,0.3),
-                                                 tr = Point(0.9,0.6),
-                                                 level = 0.6,
-                                                 bar_colours = (drawing.constants.colours.red,
-                                                                drawing.constants.colours.yellow,
-                                                                drawing.constants.colours.green),
-                                                 border_colour = drawing.constants.colours.white)
-        self.interact_box.Disable()
+                                             on_tc = globals.ui_atlas.TextureUiCoords('light_on.png'),
+                                             off_tc = globals.ui_atlas.TextureUiCoords('light_off.png'),
+                                             buffer=globals.screen_texture_buffer)
+
+        self.robot_info = ui.Box(parent = globals.screen_root,
+                                 pos = Point(0.8,0),
+                                 tr = Point(1,1),
+                                 colour = (0,0,0,0.8))
+
 
         for pos in self.enemy_positions:
             self.enemies.append( actors.Enemy( self.map, pos ) )
+
+    def morse_key_down(self):
+        self.morse.key_down(globals.time)
+        self.morse_light.TurnOn()
+        if self.map.current_robot:
+            self.map.current_robot.morse_key_down()
+
+    def morse_key_up(self):
+        self.morse.key_up(globals.time)
+        self.morse_light.TurnOff()
+        if self.map.current_robot:
+            self.map.current_robot.morse_key_up()
 
     def StartMusic(self):
         pass
