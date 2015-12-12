@@ -368,6 +368,9 @@ class GameView(ui.RootElement):
         #self.mode = modes.LevelOne(self)
         self.StartMusic()
         #self.fixed_light = actors.FixedLight( Point(11,38),Point(26,9) )
+        self.text_colour = (0,1,0,1)
+        barColours = [drawing.constants.colours.red, drawing.constants.colours.yellow, drawing.constants.colours.light_green]
+        barBorder = drawing.constants.colours.white
         self.bottom_panel = ui.Box(parent = globals.screen_root,
                              pos = Point(0,0.0),
                              tr = Point(1,0.08),
@@ -377,19 +380,19 @@ class GameView(ui.RootElement):
                                       tr = Point(0.12,0.7),
                                       text = 'Send:',
                                       scale = 10,
-                                      colour = (0,1,0,1))
+                                      colour = self.text_colour)
         self.morse_entry = ui.TextBox(parent = self.bottom_panel,
                                       bl = Point(0.08,0),
                                       tr = Point(0.35,0.7),
                                       text = ' ',
                                       scale = 10,
-                                      colour = (0,1,0,1))
+                                      colour = self.text_colour)
         self.command_text = ui.TextBox(parent = self.bottom_panel,
                                        bl = Point(0.35,0),
                                        tr = Point(0.7,0.7),
                                        text = self.command_stub,
                                        scale = 10,
-                                       colour = (0,1,0,1))
+                                       colour = self.text_colour)
 
         self.send_morse_light = ui.ToggleBox(parent = self.bottom_panel,
                                              pos = Point(0.71,0),
@@ -404,6 +407,35 @@ class GameView(ui.RootElement):
                                              on_tc = globals.ui_atlas.TextureUiCoords('red_light_on.png'),
                                              off_tc = globals.ui_atlas.TextureUiCoords('light_off.png'),
                                              buffer=globals.screen_texture_buffer)
+        self.letter_left = ui.TextBox(parent = self.bottom_panel,
+                                      bl = Point(0.8,0.5),
+                                      tr = Point(1,0.85),
+                                      text = 'Letter:',
+                                      scale = 6,
+                                      colour = self.text_colour)
+        self.letter_bar = ui.PowerBar(parent = self.bottom_panel,
+                                      pos = Point(0.9,0.55),
+                                      tr  = Point(0.99,0.95),
+                                      level = 1.0,
+                                      bar_colours=barColours,
+                                      border_colour=self.text_colour)
+
+
+        self.word_left = ui.TextBox(parent = self.bottom_panel,
+                                      bl = Point(0.8,0),
+                                      tr = Point(1,0.35),
+                                      text = ' Word :',
+                                      scale = 6,
+                                      colour = self.text_colour)
+        self.word_bar = ui.PowerBar(parent = self.bottom_panel,
+                                      pos = Point(0.9,0.05),
+                                      tr  = Point(0.99,0.45),
+                                      level = 1.0,
+                                      bar_colours=barColours,
+                                      border_colour=self.text_colour)
+
+        self.letter_bar.SetBarLevel(0)
+        self.word_bar.SetBarLevel(0)
 
         self.robot_info = ui.Box(parent = globals.screen_root,
                                  pos = Point(0.8,0.08),
