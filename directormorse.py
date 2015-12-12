@@ -133,5 +133,5 @@ def main(send,recv):
                         if handled:
                             break
 
-with morse.SoundMorse() as send, morse.SoundMorse(800) as recv:
+with morse.SoundMorse(600) as send, morse.SoundMorse(800) as recv:
     main(send,recv)

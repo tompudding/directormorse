@@ -84,7 +84,7 @@ class Player(object):
         print sd.query_devices()
         print sd.default.device
         #raise SystemExit()
-        with sd.OutputStream(channels=1, callback=self.callback,samplerate=48000, latency='low') as stream:
+        with sd.OutputStream(channels=1, callback=self.callback,samplerate=48000, blocksize=2048, latency='low') as stream:
             while self.running:
                 sd.sleep(1000)
         self.thread.join()

@@ -451,6 +451,25 @@ class GameView(ui.RootElement):
                                       pos = Point(0,0),
                                       tr = Point(1,0.4))
         self.morse.create_key(self.morse_key, self.text_colour)
+
+        self.recv_window = ui.UIElement(parent = self.robot_info,
+                                        pos = Point(0,0.7),
+                                        tr = Point(1,1))
+        self.recv_window.border = ui.Border(self.recv_window,Point(0,0),Point(1,1),colour=self.text_colour,line_width=2)
+
+        self.send_window = ui.UIElement(parent = self.robot_info,
+                                        pos = Point(0,0.55),
+                                        tr = Point(1,0.7))
+        self.send_window.border = ui.Border(self.send_window,Point(0,0),Point(1,1),colour=self.text_colour,line_width=2)
+
+        self.robot_window = ui.UIElement(parent = self.robot_info,
+                                        pos = Point(0,0.40),
+                                        tr = Point(1,0.55))
+        self.robot_window.border = ui.Border(self.robot_window,Point(0,0),Point(1,1),colour=self.text_colour,line_width=2)
+
+
+
+
         self.morse.register_light(self.send_morse_light)
         self.recv_morse.register_light(self.receive_morse_light)
 
