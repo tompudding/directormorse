@@ -92,12 +92,14 @@ class Morse(object):
     LETTER_THRESHOLD = 400
     DOT_TIME = 180
     DASH_TIME = DOT_TIME*3
+    WORD_THRESHOLD = DOT_TIME*7
     PLAY_DOT_TIME = 60
     PLAY_DASH_TIME = PLAY_DOT_TIME*3
     def __init__(self):
         self.on_times = []
         self.guess = []
         self.last_on = None
+        self.last_processed = None
         self.playing = None
         self.play_sequence = []
 
@@ -116,14 +118,16 @@ class Morse(object):
         sys.stdout.flush()
         self.last_on = None
 
-    def process(self):
+    def process(self, t):
         try:
             out = morse_to_english[''.join(self.guess)]
         except KeyError:
             out = '?'
-        print ''.join(self.guess) + ':' + out
+        #print ''.join(self.guess) + ':' + out
         self.on_times = []
         self.guess = []
+        self.last_processed = t
+        return out
 
     def playback(self, t):
         if not self.play_sequence:
@@ -158,7 +162,13 @@ class Morse(object):
             last_off = last_on + duration
             duration = t - last_off
             if duration > self.LETTER_THRESHOLD:
-                self.process()
+                return self.process(t)
+        if self.last_on is None and not self.on_times and self.last_processed is not None:
+            #It's off and there's nothing in the bank...
+            duration = t - self.last_processed
+            if duration > self.WORD_THRESHOLD:
+                self.last_processed = None
+                return True
 
     def play(self, message):
         self.play_sequence = []

@@ -59,6 +59,7 @@ class UIElement(object):
         self.children = []
         self.parent.AddChild(self)
         self.GetAbsoluteInParent = parent.GetAbsolute
+        self.GetRelativeInParent = parent.GetRelative
         self.root                = parent.root
         self.level               = parent.level + 1
         self.SetBounds(pos,tr)
@@ -597,6 +598,8 @@ class TextBox(UIElement):
     def SetText(self,text,colour = None):
         """Update the text"""
         enabled = self.enabled
+        if colour == None:
+            colour = self.colour
         self.Delete()
         if enabled:
             self.Enable()

@@ -349,6 +349,8 @@ class GameView(ui.RootElement):
         self.game_over = False
         self.mouse_world = Point(0,0)
         self.mouse_pos = Point(0,0)
+        self.command_stub = 'Command:'
+        self.command = []
         #pygame.mixer.music.load('music.ogg')
         #self.music_playing = False
         super(GameView,self).__init__(Point(0,0),globals.screen)
@@ -370,12 +372,24 @@ class GameView(ui.RootElement):
                              pos = Point(0,0.0),
                              tr = Point(0.8,0.08),
                              colour = (0,0,0,0.8))
-        self.morse_entry = ui.TextBox(parent = self.bottom_panel,
+        self.transmission = ui.TextBox(parent = self.bottom_panel,
                                       bl = Point(0,0),
-                                      tr = Point(0.5,0.8),
-                                      text = 'monkey',
-                                      scale = 12,
+                                      tr = Point(0.12,0.7),
+                                      text = 'Send:',
+                                      scale = 10,
                                       colour = (0,1,0,1))
+        self.morse_entry = ui.TextBox(parent = self.bottom_panel,
+                                      bl = Point(0.08,0),
+                                      tr = Point(0.45,0.7),
+                                      text = ' ',
+                                      scale = 10,
+                                      colour = (0,1,0,1))
+        self.command_text = ui.TextBox(parent = self.bottom_panel,
+                                       bl = Point(0.45,0),
+                                       tr = Point(1,0.7),
+                                       text = self.command_stub,
+                                       scale = 10,
+                                       colour = (0,1,0,1))
 
         self.morse_light = ui.ToggleBox(parent = self.bottom_panel,
                                              pos = Point(0.96,0),
@@ -388,7 +402,6 @@ class GameView(ui.RootElement):
                                  pos = Point(0.8,0),
                                  tr = Point(1,1),
                                  colour = (0,0,0,0.8))
-
 
         for pos in self.enemy_positions:
             self.enemies.append( actors.Enemy( self.map, pos ) )
@@ -427,6 +440,21 @@ class GameView(ui.RootElement):
 
         if self.game_over:
             return
+        letter = self.morse.update(t)
+        if letter == True: #This indicates the end of a command
+            print ''.join(self.command)
+            self.command = []
+            self.command_text.SetText(self.command_stub)
+        elif letter:
+            self.command.append(letter)
+            self.command_text.SetText(self.command_stub + ''.join(self.command))
+
+        guess = ''.join(self.morse.guess)
+        if guess != self.morse_entry.text:
+            if guess:
+                self.morse_entry.SetText(guess)
+            else:
+                self.morse_entry.SetText(' ')
 
         self.t = t
         self.viewpos.Update(t)
