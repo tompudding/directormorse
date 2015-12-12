@@ -102,9 +102,16 @@ class Morse(object):
         self.last_processed = None
         self.playing = None
         self.play_sequence = []
+        self.letter_bar = None
+        self.word_bar = None
+
+    def register_bars(self, letter_bar, word_bar):
+        self.letter_bar = letter_bar
+        self.word_bar = word_bar
 
     def key_down(self, t):
         self.last_on = t
+        self.set_letter_bar(1)
 
     def key_up(self, t):
         if self.last_on is None:
@@ -152,8 +159,18 @@ class Morse(object):
                 self.play_sequence.pop(0)
         return False
 
+    def set_word_bar(self,level):
+        if self.word_bar:
+            self.word_bar.SetBarLevel(level)
+
+    def set_letter_bar(self,level):
+        if self.letter_bar:
+            self.letter_bar.SetBarLevel(level)
+
     def update(self, t):
         if self.playback(t):
+            self.letter_bar.SetBarLevel(0)
+            self.set_word_bar(0)
             return
 
         if self.last_on is None and self.on_times:
@@ -161,14 +178,25 @@ class Morse(object):
             last_on,duration = self.on_times[-1]
             last_off = last_on + duration
             duration = t - last_off
+            self.set_word_bar(1)
             if duration > self.LETTER_THRESHOLD:
+                self.set_letter_bar(0)
                 return self.process(t)
+            else:
+                diff = self.LETTER_THRESHOLD-duration
+                partial = float(diff) / self.LETTER_THRESHOLD
+                self.set_letter_bar(partial)
         if self.last_on is None and not self.on_times and self.last_processed is not None:
             #It's off and there's nothing in the bank...
             duration = t - self.last_processed
+            self.set_letter_bar(0)
             if duration > self.WORD_THRESHOLD:
                 self.last_processed = None
                 return True
+            else:
+                diff = self.WORD_THRESHOLD-duration
+                partial = float(diff) / self.WORD_THRESHOLD
+                self.set_word_bar(partial)
 
     def play(self, message):
         self.play_sequence = []

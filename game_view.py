@@ -436,6 +436,7 @@ class GameView(ui.RootElement):
 
         self.letter_bar.SetBarLevel(0)
         self.word_bar.SetBarLevel(0)
+        self.morse.register_bars(self.letter_bar, self.word_bar)
 
         self.robot_info = ui.Box(parent = globals.screen_root,
                                  pos = Point(0.8,0.08),
