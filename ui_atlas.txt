@@ -1,3 +1,3 @@
-resource/ui/light_off.png:ui_atlas_0.png:0:896.0:81:128
-resource/ui/light_on.png:ui_atlas_0.png:81:896.0:81:128
-resource/ui/red_light_on.png:ui_atlas_0.png:162:896.0:81:128
+resource/ui/light_off.png:ui_atlas_0.png:0:128.0:81:128
+resource/ui/light_on.png:ui_atlas_0.png:81:128.0:81:128
+resource/ui/red_light_on.png:ui_atlas_0.png:162:128.0:81:128
