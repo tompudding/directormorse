@@ -2,7 +2,9 @@ import numpy as np
 import threading
 import multiprocessing
 import sys
+import ui
 import globals
+from globals.types import Point
 
 english_to_morse = {
         'A': '.-',              'a': '.-',
@@ -208,6 +210,28 @@ class Morse(object):
                 pos += duration
                 pos += self.PLAY_DOT_TIME
             pos += self.PLAY_DASH_TIME
+
+    def create_key(self, elem, colour):
+        alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        alpha_0 = alphabet[:18][::-1]
+        alpha_1 = alphabet[18:][::-1]
+        elem.text_items = []
+        margin_height = 0.05
+        margin_width  = 0.02
+        height = (1.0-2*margin_height)/18
+        width  = (1.0-2*margin_width)/2
+        for i,alpha in enumerate((alpha_0,alpha_1)):
+            for j in xrange(18):
+                x = margin_width+i*width
+                y = margin_height+j*height
+                item = ui.TextBox(parent = elem,
+                                  bl = Point(x,y),
+                                  tr = Point(x+width,y+height),
+                                  scale = 6,
+                                  text = '%s : %s' % (alpha[j], english_to_morse[alpha[j]]),
+                                  colour=colour)
+                elem.text_items.append(item)
+
 
 class SoundMorse(Morse):
     def __enter__(self):

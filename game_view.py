@@ -394,6 +394,8 @@ class GameView(ui.RootElement):
                                        scale = 10,
                                        colour = self.text_colour)
 
+
+
         self.send_morse_light = ui.ToggleBox(parent = self.bottom_panel,
                                              pos = Point(0.71,0),
                                              tr = Point(0.75,1),
@@ -442,6 +444,11 @@ class GameView(ui.RootElement):
                                  pos = Point(0.8,0.08),
                                  tr = Point(1,1),
                                  colour = (0,0,0,0.8))
+
+        self.morse_key = ui.UIElement(parent = self.robot_info,
+                                      pos = Point(0,0),
+                                      tr = Point(1,0.4))
+        self.morse.create_key(self.morse_key, self.text_colour)
 
         for pos in self.enemy_positions:
             self.enemies.append( actors.Enemy( self.map, pos ) )
