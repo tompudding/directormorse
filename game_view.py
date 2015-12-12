@@ -335,12 +335,53 @@ class TimeOfDay(object):
 
         return (1,3,-5),(0.25,0.25,0.4)
 
+class RecvWindow(ui.UIElement):
+    max_width = 13
+    def __init__(self,parent,bl,tr,colour):
+        super(RecvWindow,self).__init__(parent,bl,tr)
+        self.colour = colour
+        self.border = ui.Border(self,Point(0,0),Point(1,1),colour=self.colour,line_width=2)
+        num_rows = 10
+        self.rows = []
+        margin_height = 0.02
+        margin_width  = 0.01
+        height = (1.0-2*margin_height)/num_rows
+        self.current_row = 0
+        self.row_text = [[] for i in xrange(num_rows)]
+        for i in xrange(num_rows):
+            row = ui.TextBox(parent = self,
+                             bl = Point(margin_width,margin_height + i*height),
+                             tr = Point(1-margin_width,margin_height + (i+1)*height),
+                             text = ' ',
+                             scale = 8,
+                             colour = self.colour)
+            self.rows.insert(0,row)
+
+    def new_line(self):
+        if self.current_row < len(self.rows) - 1:
+            self.current_row += 1
+            return
+        #Once we're at the bottom we stay at the bottom and just move everything up
+        self.row_text = self.row_text[1:] + [[]]
+        for i,row in enumerate(self.rows):
+            row.SetText(''.join(self.row_text[i]) if self.row_text[i] else ' ')
+
+    def add_letter(self, k):
+        row = self.rows[self.current_row]
+        text = self.row_text[self.current_row]
+        if len(text) > self.max_width:
+            self.new_line()
+            return self.add_letter(k)
+
+        text.append(k)
+        row.SetText(''.join(text))
+
 
 class GameView(ui.RootElement):
     def __init__(self, send_morse, recv_morse):
         self.morse = send_morse
         self.recv_morse = recv_morse
-        self.recv_morse.play('Monkey face')
+        self.recv_morse.play('Any key to morse. Command robot, find candy\n--------------')
         self.atlas = globals.atlas = drawing.texture.TextureAtlas('tiles_atlas_0.png','tiles_atlas.txt')
         self.enemies = []
         globals.ui_atlas = drawing.texture.TextureAtlas('ui_atlas_0.png','ui_atlas.txt',extra_names=False)
@@ -452,10 +493,10 @@ class GameView(ui.RootElement):
                                       tr = Point(1,0.4))
         self.morse.create_key(self.morse_key, self.text_colour)
 
-        self.recv_window = ui.UIElement(parent = self.robot_info,
-                                        pos = Point(0,0.7),
-                                        tr = Point(1,1))
-        self.recv_window.border = ui.Border(self.recv_window,Point(0,0),Point(1,1),colour=self.text_colour,line_width=2)
+        self.recv_window = RecvWindow(parent = self.robot_info,
+                                      bl = Point(0,0.7),
+                                      tr = Point(1,1),
+                                      colour=self.text_colour)
 
         self.send_window = ui.UIElement(parent = self.robot_info,
                                         pos = Point(0,0.55),
@@ -509,7 +550,12 @@ class GameView(ui.RootElement):
         if self.game_over:
             return
         letter = self.morse.update(t)
-        self.recv_morse.update(t)
+        r = self.recv_morse.update(t)
+        if r:
+            if r == True:
+                self.recv_window.new_line()
+            else:
+                self.recv_window.add_letter(r)
         if letter == True: #This indicates the end of a command
             print ''.join(self.command)
             self.command = []

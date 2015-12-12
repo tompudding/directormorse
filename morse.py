@@ -44,13 +44,14 @@ english_to_morse = {
         '8': '---..',           '(': '-.--.-',
         '9': '----.',           ')': '-.--.-',
         ' ': ' ',               '_': '..--.-',
+        '\n' : ' ',
 }
 
 morse_to_english = {morse:english for english,morse in english_to_morse.iteritems()}
 
 class Player(object):
     def callback(self, outdata, frames, time, status):
-        if not self.playing:
+        if not self.playing or self.broken:
             outdata.fill(0)
             return
         if self.pos + frames > len(self.tone):
@@ -78,6 +79,7 @@ class Player(object):
         self.tone = generate.GenerateTone(freq=freq, vol=1.0/400000)
         self.playing = False
         self.running = True
+        self.broken = False
         self.pos = 0
         self.thread = threading.Thread(target=self.input_thread, args=(conn, ))
         self.thread.start()
@@ -87,6 +89,7 @@ class Player(object):
         with sd.OutputStream(channels=1, callback=self.callback,samplerate=48000, blocksize=2048, latency='low') as stream:
             while self.running:
                 sd.sleep(1000)
+
         self.thread.join()
 
 
@@ -95,18 +98,10 @@ class Morse(object):
     DOT_TIME = 180
     DASH_TIME = DOT_TIME*3
     WORD_THRESHOLD = DOT_TIME*7
-    PLAY_DOT_TIME = 60
+    PLAY_DOT_TIME = 80
     PLAY_DASH_TIME = PLAY_DOT_TIME*3
     def __init__(self):
-        self.on_times = []
-        self.guess = []
-        self.last_on = None
-        self.last_processed = None
-        self.playing = None
-        self.play_sequence = []
-        self.letter_bar = None
-        self.word_bar = None
-        self.light = None
+        self.reset()
 
     def register_bars(self, letter_bar, word_bar):
         self.letter_bar = letter_bar
@@ -144,28 +139,41 @@ class Morse(object):
         self.last_processed = t
         return out
 
+    def reset(self):
+        self.on_times = []
+        self.guess = []
+        self.last_on = None
+        self.last_processed = None
+        self.playing = None
+        self.play_sequence = None
+        self.letter_bar = None
+        self.word_bar = None
+        self.light = None
+
     def playback(self, t):
-        if not self.play_sequence:
+        if self.play_sequence is None:
             return False
+        if not self.play_sequence:
+            self.reset()
+            return None
 
-        while self.play_sequence:
-            start,duration = self.play_sequence[0]
-            #print start,duration,t,self.playing
-            if t < start:
-                return True
+        key,start,duration = self.play_sequence[0]
+        #print start,duration,t,self.playing
+        if t < start:
+            return True
 
-            elif t < start + duration:
-                if self.playing is None:
-                    self.key_down(t)
-                    self.playing = (start, duration)
-                return True
+        elif t < start + duration:
+            if self.playing is None:
+                self.key_down(t)
+                self.playing = (key, start, duration)
+            return True
 
-            else:
-                #We've done this one
-                self.playing = None
-                self.key_up(t)
-                self.play_sequence.pop(0)
-        return False
+        else:
+            #We've done this one
+            self.playing = None
+            self.key_up(t)
+            self.play_sequence.pop(0)
+            return key if key is not None else False
 
     def set_word_bar(self,level):
         if self.word_bar:
@@ -176,10 +184,19 @@ class Morse(object):
             self.letter_bar.SetBarLevel(level)
 
     def update(self, t):
-        if self.playback(t):
+        r = self.playback(t)
+        if r or r is None:
+            if r is True:
+                #True from playback means it's still going, True from this function means it's the end of a word.
+                #Bloody hacky LD code
+                return False
+            if r is None:
+                return True
             self.set_letter_bar(0)
             self.set_word_bar(0)
-            return
+            if r == '\n':
+                return True
+            return r
 
         if self.last_on is None and self.on_times:
             #It's off and we've got some in the bank
@@ -210,9 +227,10 @@ class Morse(object):
         self.play_sequence = []
         pos = globals.time
         for letter in message:
-            for key in english_to_morse[letter]:
+            for i,key in enumerate(english_to_morse[letter]):
                 duration = self.PLAY_DOT_TIME if key == '.' else self.PLAY_DASH_TIME
-                self.play_sequence.append( (pos,duration) )
+                #This is the hackiest shit
+                self.play_sequence.append( (letter if i == len(english_to_morse[letter])-1 else None, pos, duration) )
                 pos += duration
                 pos += self.PLAY_DOT_TIME
             pos += self.PLAY_DASH_TIME
