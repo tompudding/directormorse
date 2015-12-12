@@ -13,11 +13,18 @@ def main(m):
     pygame.key.set_repeat(500,50)
     screen = pygame.display.set_mode((width, height))
     import pygame.mixer
+    clock = pygame.time.Clock()
+    clock.tick(60)
 
     playing = False
     while True:
+        t = pygame.time.get_ticks()
+        m.update(t)
         for event in pygame.event.get():
-            t = pygame.time.get_ticks()
+            if event.type == pygame.locals.QUIT:
+                done = True
+                break
+
             if event.type == pygame.locals.KEYDOWN:
                 if event.key == pygame.locals.K_SPACE and not playing:
                     m.key_down(t)
