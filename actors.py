@@ -34,6 +34,7 @@ class Actor(object):
         self.last_update    = None
         self.dead           = False
         self.move_speed     = Point(0,0)
+        self.angle_speed    = 0
         self.move_direction = Point(0,0)
         self.pos = None
         self.last_damage = 0
@@ -104,8 +105,9 @@ class Actor(object):
         elapsed = globals.time - self.last_update
         self.last_update = globals.time
 
+        self.set_angle(self.angle + self.angle_speed*elapsed*globals.time_step)
 
-        self.move_speed += self.move_direction*elapsed*globals.time_step
+        self.move_speed += self.move_direction.Rotate(self.angle)*elapsed*globals.time_step
         self.move_speed *= 0.7*(1-(elapsed/1000.0))
 
         if self.interacting:
@@ -311,6 +313,14 @@ class Robot(Actor):
     texture = 'robot'
     width = 16
     height = 16
+
+    def __init__(self,map,pos):
+        super(Robot,self).__init__(map,pos)
+        self.light = ActorLight(self)
+
+    def Update(self,t):
+        super(Robot,self).Update(t)
+        self.light.Update(t)
 
     def morse_key_down(self):
         pass

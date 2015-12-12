@@ -1,6 +1,7 @@
 import math,os
 
 import warnings
+import cmath
 warnings.simplefilter('error')
 class FatalError(Exception):
     pass
@@ -77,6 +78,11 @@ class Point(object):
 
     def length(self):
         return math.sqrt(self.x**2 + self.y**2)
+
+    def Rotate(self,angle):
+        r,a = cmath.polar(self.x + self.y*1j)
+        x = cmath.rect(r,a + angle)
+        return Point(x.real,x.imag)
 
     def SquareLength(self):
         return self.x**2 + self.y**2

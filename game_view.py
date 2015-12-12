@@ -140,6 +140,8 @@ class TileTypes:
     CRATE               = 6
     ENEMY               = 7
 
+    Impassable = set()
+
 
 class TileData(object):
     texture_names = {TileTypes.SNOW         : 'snow.png',
@@ -308,7 +310,7 @@ class TimeOfDay(object):
         if t < 0.125:
             #dawn
             colour  = [d_k*math.sin(40*t/math.pi) for i in (0,1,2)]
-            colour[2] *= 1.2
+            colour[2] *= 1.4
             ambient = [a_k*math.sin(40*t/math.pi) for i in (0,1,2)]
         elif t < 0.375:
             #daylight
@@ -426,7 +428,8 @@ class GameView(ui.RootElement):
             self.viewpos._pos.y = (self.map.world_size.y - globals.screen.y)
 
         self.mouse_world = self.viewpos.pos + self.mouse_pos
-        #self.map.player.Update(t)
+        for robot in self.map.robots:
+            robot.Update(t)
 
     def GameOver(self):
         self.game_over = True

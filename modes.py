@@ -77,13 +77,53 @@ class Titles(Mode):
         return TitleStages.STARTED
 
 class GameMode(Mode):
+    speed = 10
+    angle_amounts = {pygame.K_LEFT  : 0.01*speed,
+                     pygame.K_RIGHT : -0.01*speed}
+    direction_amounts = {pygame.K_UP    : Point( 0.00, 0.01*speed),
+                         pygame.K_DOWN  : Point( 0.00,-0.01*speed)}
+    class KeyFlags:
+        LEFT  = 1
+        RIGHT = 2
+        UP    = 4
+        DOWN  = 8
+
+    keyflags = {pygame.K_LEFT  : KeyFlags.LEFT,
+                pygame.K_RIGHT : KeyFlags.RIGHT,
+                pygame.K_UP    : KeyFlags.UP,
+                pygame.K_DOWN  : KeyFlags.DOWN}
+
     def __init__(self,parent):
         self.parent            = parent
+        self.keydownmap = {}
+        self.parent.viewpos.Follow(globals.time,self.parent.map.current_robot)
 
     def KeyDown(self,input_key):
-        self.parent.map.current_robot.morse_key_down()
+        key = input_key
+        if key in self.keyflags:
+            if self.keyflags[key] in self.keydownmap:
+                return
+            if key in self.angle_amounts:
+                self.keydownmap[self.keyflags[key]] = input_key
+                self.parent.map.current_robot.angle_speed += self.angle_amounts[key]
+            elif key in self.direction_amounts:
+                self.keydownmap[self.keyflags[key]] = input_key
+                self.parent.map.current_robot.move_direction += self.direction_amounts[key]
+        else:
+            self.parent.map.current_robot.morse_key_down()
 
     def KeyUp(self,input_key):
+        key = input_key
+        if key in self.keyflags:
+            if self.keyflags[key] not in self.keydownmap:
+                return
+            if key in self.angle_amounts and (self.keydownmap[self.keyflags[key]] == input_key):
+                del self.keydownmap[self.keyflags[key]]
+                self.parent.map.current_robot.angle_speed -= self.angle_amounts[key]
+            elif key in self.direction_amounts and (self.keydownmap[self.keyflags[key]] == input_key):
+                del self.keydownmap[self.keyflags[key]]
+                self.parent.map.current_robot.move_direction -= self.direction_amounts[key]
+
         self.parent.map.current_robot.morse_key_up()
 
     def MouseButtonDown(self,pos,button):
