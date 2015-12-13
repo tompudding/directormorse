@@ -153,11 +153,13 @@ class TileTypes:
     ICE_TOP_LEFT        = 20
     ICE_BOTTOM_LEFT     = 21
     ICE_BOTTOM_RIGHT    = 22
+    ROCK_END_RIGHT      = 23
+    ROCK_END_LEFT      = 24
 
     Impassable = set((WALL,TREE,DOOR_CLOSED,ROCK,CANDY_CANE))
     Doors = set([DOOR_CLOSED, DOOR_OPEN])
     Robots = set([ACTIVATING_ROBOT, BASHING_ROBOT])
-    Rocks  = set([ROCK,UP_ROCK])
+    Rocks  = set([ROCK,UP_ROCK,ROCK_END_RIGHT,ROCK_END_LEFT])
     Choppable = set([TREE,CANDY_CANE])
 
 
@@ -179,6 +181,8 @@ class TileData(object):
                      TileTypes.UP_ROCK   : 'uprock.png',
                      TileTypes.CANDY_CANE : 'candy_cane.png',
                      TileTypes.DOOR_CLOSED   : 'door_closed.png',
+                     TileTypes.ROCK_END_RIGHT : 'rock_end_right.png',
+                     TileTypes.ROCK_END_LEFT : 'rock_end_left.png',
                      TileTypes.DOOR_OPEN     : 'door_open.png'}
     level = 0
     def __init__(self, type, pos, last_type, parent):
@@ -309,6 +313,8 @@ class GameMap(object):
                      '6' : TileTypes.ICE_TOP_LEFT,
                      '7' : TileTypes.ICE_BOTTOM_RIGHT,
                      '8' : TileTypes.ICE_BOTTOM_LEFT,
+                     '\\' : TileTypes.ROCK_END_RIGHT,
+                     '/' : TileTypes.ROCK_END_LEFT,
                      }
 
     def __init__(self,name,parent):

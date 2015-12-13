@@ -5,20 +5,20 @@ T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T B
 T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T B
                                                +-
 T T                                            +----+         T T B
-                                               |....|
+                                               |.r..|
 T T       T T                                  d....|         T T B
                                                +----+
 T T       T T                   l              +-             T T B
 
 T T  l    T T                                                 T T B
 
-T T       T T                                                 T T B
+T T  R    T T                                                 T T B
 
 T T       T T                                                 T T B
 
 T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T B
 
-b b b b b b b b b b b b b b b T T b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b
+b b b b b b b b b b b b b b \ T T / b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b
       63333333333333333333333333333333333333333333333333335
 T T T 2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1 T T T T T T T T T T T T T T T T T T T B
       2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1
@@ -28,9 +28,9 @@ T T T 2iiiiiiiiiiliiiiiiiiiiiiiiiiiiiiiiiiiiiiiliiiiiiiiii1 T T T T T T T  |....
       2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1                |.............|
 T T T 2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1 T T T T T T T  |.....c....l..|    T T B
       2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1                |.............|
-T T T 2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1                |.............|    T T B
-      2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1  R  r          d.............|
-T T T 2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1 l              +-------------+    T T B
+T T T 2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1 T              |.............|    T T B
+      2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1                d.............|
+T T T 2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1 T   l          +-------------+    T T B
       2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1
 T T T 2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1 T T T T T T T T T T T T T T T T T T T B
       2iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii1

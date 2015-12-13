@@ -615,7 +615,7 @@ class BashingRobot(Robot):
         self.dig_quads = []
         self.num_dug = 0
         #Temp hack for debugging
-        self.found_axe()
+        #self.found_axe()
 
 
     def SetPos(self,pos):
