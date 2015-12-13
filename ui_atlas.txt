@@ -1,3 +1,4 @@
 resource/ui/light_off.png:ui_atlas_0.png:0:128.0:81:128
 resource/ui/light_on.png:ui_atlas_0.png:81:128.0:81:128
 resource/ui/red_light_on.png:ui_atlas_0.png:162:128.0:81:128
+resource/ui/candy_cane.png:ui_atlas_0.png:0:96.0:32:32

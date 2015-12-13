@@ -127,6 +127,7 @@ class GameMode(Mode):
                 self.parent.map.current_robot.move_direction -= self.direction_amounts[key]
         elif key == pygame.K_TAB:
             self.parent.next_robot()
+
         elif key == pygame.K_SPACE:
             if hasattr(self.parent.map.current_robot,'activate'):
                 self.parent.map.current_robot.activate()
@@ -140,6 +141,46 @@ class GameMode(Mode):
     def MouseButtonUp(self,pos,button):
         self.parent.map.current_robot.unclick(pos,button)
         return False,False
+
+class FallingItem(object):
+    def __init__(self,right=False):
+
+        self.pos = globals.screen_abs*Point(1.0 if right else random.random(),random.random()*2 if right else random.random())
+        self.radius = 64
+        self.angle = random.random()*math.pi*2
+        self.quad = drawing.Quad(globals.screen_texture_buffer,tc = globals.ui_atlas.TextureUiCoords('candy_cane.png'))
+        self.set_pos(self.pos, self.angle)
+        self.move_speed = Point(-1 +(random.random()-0.5)*0.2,-0.5+ (random.random()-0.5)*0.2)*3
+        self.rotation_speed = (random.random()-0.5)*0.1
+        self.dead = False
+        self.last_update = None
+
+    def set_pos(self,pos,angle):
+        self.pos = pos
+        self.angle = angle
+        vertices = []
+        for i in xrange(4):
+            r = cmath.rect(self.radius,self.angle + (math.pi*(i*0.5 + 0.25)))
+            vertices.append(self.pos + Point(r.real, r.imag))
+        self.quad.SetAllVertices(vertices,100)
+
+    def Update(self):
+        if self.dead:
+            return False
+        if self.last_update == None:
+            self.last_update = globals.time
+            return True
+        elapsed = globals.time - self.last_update
+        self.last_update = globals.time
+        amount = Point(self.move_speed.x*elapsed*0.03,self.move_speed.y*elapsed*0.03)
+        target = self.pos + amount
+        new_angle = self.angle + self.rotation_speed*elapsed*0.03
+        self.set_pos(target, new_angle)
+
+    def Delete(self):
+        self.quad.Delete()
+        self.dead = True
+
 
 class GameOver(Mode):
     blurb = "Oh no, you managed to kill your robots somehow"
@@ -161,6 +202,7 @@ class GameOver(Mode):
                                      bl     = bl         ,
                                      tr     = tr         ,
                                      text   = self.blurb ,
+                                     colour = (1,0,0,1),
                                      textType = drawing.texture.TextTypes.SCREEN_RELATIVE,
                                      scale  = 30)
 
@@ -171,15 +213,31 @@ class GameOver(Mode):
         self.skipped_text = False
         self.letter_duration = 20
         self.continued = False
+        self.falling_items = []
+        for i in xrange(100):
+            self.falling_items.append(FallingItem())
         #pygame.mixer.music.load('end_fail.mp3')
         #pygame.mixer.music.play(-1)
 
     def Update(self,t):
         if self.start == None:
             self.start = t
+        for item in self.falling_items:
+            item.Update()
+            if item.pos.x < 0 or item.pos.y < 0:
+                item.Delete()
+        orig = len(self.falling_items)
+        self.falling_items = [item for item in self.falling_items if not item.dead]
+        while len(self.falling_items) < orig:
+            self.falling_items.append(FallingItem(right=True))
+
         self.elapsed = t - self.start
-        self.stage = self.handlers[self.stage](t)
+        try:
+            self.stage = self.handlers[self.stage](t)
+        except KeyError:
+            return
         if self.stage == TitleStages.COMPLETE:
+            return
             raise sys.exit('Come again soon!')
 
     def Wait(self,t):
