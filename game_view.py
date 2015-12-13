@@ -100,7 +100,7 @@ class Viewpos(object):
             fpos = (self.follow.GetPosCentre()*globals.tile_dimensions).to_int() + globals.screen*Point(0,0.03)
             if not fpos:
                 return
-            target = fpos - (globals.screen*0.5).to_int()
+            target = fpos - (globals.screen*Point(0.35,0.46)).to_int()
             diff = target - self._pos
             #print diff.SquareLength(),self.follow_threshold
             direction = diff.direction()
