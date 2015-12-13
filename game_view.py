@@ -265,9 +265,9 @@ class GameMap(object):
                                 if self.data[x+tile_x][y+tile_y] == TileTypes.SNOW:
                                     self.data[x+tile_x][y+tile_y] = td
                         if self.input_mapping[tile] == TileTypes.ACTIVATING_ROBOT:
-                            robot_positions.append((Point(x+0.2,y),actors.ActivatingRobot))
+                            robot_positions.append((Point(x+0.2,y),actors.ActivatingRobot,0))
                         if self.input_mapping[tile] == TileTypes.BASHING_ROBOT:
-                            robot_positions.append((Point(x+0.2,y),actors.BashingRobot))
+                            robot_positions.append((Point(x+0.2,y),actors.BashingRobot,math.pi*0.5))
                         if self.input_mapping[tile] == TileTypes.ENEMY:
                             self.parent.enemy_positions.append(Point(x+0.2,y))
                     #except KeyError:
@@ -277,8 +277,9 @@ class GameMap(object):
                     break
         if not robot_positions:
             raise Exception('No robots defined')
-        for pos,c in robot_positions:
+        for pos,c,angle in robot_positions:
             robot = c(self,pos)
+            robot.set_angle(angle)
             self.robots.append(robot)
             self.actors.append(robot)
         self.current_robot = self.robots[1]

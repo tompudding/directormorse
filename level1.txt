@@ -1,28 +1,24 @@
-T T T T T T T T T T T
+T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T
 
-T T T T T T T T T T T
+T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T
 
-T T T T T T T T T T T
+T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T
 
+T T                                            +----+         T T
+                                               |  r |
+T T       T T                                  |    |         T T
+                                               +----+
+T T       T T                   l                             T T
 
+T T  l    T T                                                 T T
 
-                        r
+T T       T T                                                 T T
+      R
+T T       T T                                                 T T
 
-                          l
+T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T
 
-
-
-                   R
-
-
-
-
-
-
-
-
-
-
+T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T
 
 
 

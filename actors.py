@@ -281,8 +281,8 @@ class FixedLight(object):
 
 
 class ConeLight(object):
-    width = 400
-    height = 400
+    width = 700
+    height = 700
     z = 60
     def __init__(self,pos,angle,width):
         self.quad_buffer = drawing.QuadBuffer(4)
