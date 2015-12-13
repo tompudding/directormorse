@@ -358,8 +358,8 @@ class Torch(ConeLight):
 
 class Robot(Actor):
     texture = 'robot'
-    width = 16
-    height = 16
+    width = 24
+    height = 24
     forward_speed = Point( 0.00, 0.04)
     rotation_speed = 0.04
     name = 'unknown'
@@ -566,12 +566,14 @@ class ActivatingRobot(Robot):
 
 
 class BashingRobot(Robot):
+    texture = 'robot_blue'
     name = 'Chopper'
 
     def __init__(self,map,pos):
         super(BashingRobot,self).__init__(map,pos)
         self.dig_quads = []
         self.num_dug = 0
+        self.axe = False
 
     def setup_info(self):
         #Add special commands
@@ -594,7 +596,9 @@ class BashingRobot(Robot):
 
         axe = self.map.axe_position+Point(0.5,0.5)
         distance = (self.mid_point() - axe).length()
-        print distance
+        if distance < 1.5:
+            #We found the axe!
+            self.axe = True
 
     def chop(self,command):
         pass
