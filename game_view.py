@@ -266,6 +266,14 @@ class GameMap(object):
             self.actors.append(robot)
         self.current_robot = self.robots[1]
         self.current_robot.Select()
+        self.current_robot_index = 1
+
+    def next_robot(self):
+        self.current_robot.UnSelect()
+        self.current_robot_index = (self.current_robot_index + 1) % len(self.robots)
+        self.current_robot = self.robots[self.current_robot_index]
+        self.current_robot.Select()
+        return self.current_robot
 
     def AddObject(self,obj):
         self.object_list.append(obj)
@@ -595,6 +603,10 @@ class GameView(ui.RootElement):
         self.mouse_world = self.viewpos.pos + self.mouse_pos
         for robot in self.map.robots:
             robot.Update(t)
+
+    def next_robot(self):
+        robot = self.map.next_robot()
+        self.viewpos.Follow(globals.time,robot)
 
     def GameOver(self):
         self.game_over = True
