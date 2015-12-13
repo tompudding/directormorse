@@ -5,8 +5,8 @@ T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T
 T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T
 
 T T                                            +----+         T T
-                                               |  r |
-T T       T T                                  |    |         T T
+                                               |..r.|
+T T       T T                                  d....|         T T
                                                +----+
 T T       T T                   l                             T T
 

@@ -140,18 +140,22 @@ class TileTypes:
     CRATE               = 7
     ENEMY               = 8
     TREE                = 9
+    DOOR_CLOSED         = 10,
+    DOOR_OPEN           = 11,
 
-    Impassable = set((TREE,))
+    Impassable = set((WALL,TREE,DOOR_CLOSED))
+    Doors = set([DOOR_CLOSED, DOOR_OPEN])
+    Robots = set([ACTIVATING_ROBOT, BASHING_ROBOT])
 
 
 class TileData(object):
     texture_names = {TileTypes.SNOW       : 'snow.png',
                      TileTypes.WALL       : 'wall.png',
                      TileTypes.TILE       : 'tile.png',
-                     TileTypes.ACTIVATING_ROBOT : 'snow.png',
-                     TileTypes.BASHING_ROBOT : 'snow.png',
                      TileTypes.TREE       : 'tree.png',
-                     TileTypes.CRATE      : 'crate.png',}
+                     TileTypes.CRATE      : 'crate.png',
+                     TileTypes.DOOR_CLOSED   : 'door_closed.png',
+                     TileTypes.DOOR_OPEN     : 'door_open.png'}
     level = 0
     def __init__(self, type, pos, last_type, parent):
         self.pos  = pos
@@ -189,6 +193,20 @@ class TileData(object):
         except KeyError:
             pass
 
+class Door(TileData):
+    def Toggle(self):
+        if self.type == TileTypes.DOOR_CLOSED:
+            self.type = TileTypes.DOOR_OPEN
+            #globals.sounds.door.play()
+        else:
+            self.type = TileTypes.DOOR_CLOSED
+            #globals.sounds.doorclosed.play()
+        self.quad.SetTextureCoordinates(globals.atlas.TextureSpriteCoords(self.texture_names[self.type]))
+
+    def Activate(self,player):
+        self.Toggle()
+
+
 class LightTile(TileData):
     def __init__(self, type, pos, last_type, parent):
         #Firstly decide what kind of tile we want
@@ -207,12 +225,17 @@ class TreeTile(TileData):
 def TileDataFactory(map,type,pos,last_type,parent):
     #Why don't I just use a dictionary for this?
 
-    if type == TileTypes.LIGHT:
+    if type in TileTypes.Doors:
+        return Door(type, pos, last_type,parent)
+
+    elif type == TileTypes.LIGHT:
         return LightTile(type,pos,last_type,parent)
 
     elif type == TileTypes.TREE:
         return TreeTile(type,pos,last_type,parent)
 
+    elif type in TileTypes.Robots:
+        return TileData(last_type,pos,last_type,parent)
     return TileData(type,pos,last_type,parent)
 
 class GameMap(object):
@@ -223,6 +246,7 @@ class GameMap(object):
                      '+' : TileTypes.WALL,
                      'R' : TileTypes.ACTIVATING_ROBOT,
                      'r' : TileTypes.BASHING_ROBOT,
+                     'd' : TileTypes.DOOR_CLOSED,
                      'l' : TileTypes.LIGHT,
                      'e' : TileTypes.ENEMY,
                      'T' : TileTypes.TREE,
