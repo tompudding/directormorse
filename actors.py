@@ -385,7 +385,14 @@ class Robot(Actor):
         pass
 
     def execute_command(self,command):
-        pass
+        print 'Got command',command
+        command = command.lower()
+        command_name,command_data = command[:1],command[1:]
+        try:
+            self.commands[command_name](command_data)
+        except KeyError:
+            globals.game_view.recv_morse.play('UC '+command_name)
+
 
 class ActivatingRobot(Robot):
     name = 'Activator'

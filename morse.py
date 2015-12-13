@@ -148,7 +148,6 @@ class Morse(object):
         self.play_sequence = None
         self.letter_bar = None
         self.word_bar = None
-        self.light = None
 
     def playback(self, t):
         if self.play_sequence is None:
@@ -191,7 +190,7 @@ class Morse(object):
                 #Bloody hacky LD code
                 return False
             if r is None:
-                return True
+                return 4
             self.set_letter_bar(0)
             self.set_word_bar(0)
             if r == '\n':
@@ -224,6 +223,11 @@ class Morse(object):
                 self.set_word_bar(partial)
 
     def play(self, message):
+        if not message.endswith('\n>'):
+            message += '\n>'
+        if self.play_sequence:
+            #We're playing something already, let's terminate it
+            message = '\n>' + message
         self.play_sequence = []
         pos = globals.time
         for letter in message:

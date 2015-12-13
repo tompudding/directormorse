@@ -567,10 +567,15 @@ class GameView(ui.RootElement):
         if self.game_over:
             return
         letter = self.morse.update(t)
+        if letter == 4:
+            letter = True
         r = self.recv_morse.update(t)
         if r:
-            if r == True:
+            if r == True or r == '\n':
+                print 'newline'
                 self.recv_window.new_line()
+            elif r == 4:
+                pass
             else:
                 self.recv_window.add_letter(r)
         if letter == True: #This indicates the end of a command
