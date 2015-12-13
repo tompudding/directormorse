@@ -45,6 +45,8 @@ class Actor(object):
         self.SetPos(pos)
         self.set_angle(3*math.pi/2)
         self.hand_offset = Point(0,self.size.y*1.1)
+        self.track_quads = []
+        self.last_track = 0
 
     def mid_point(self):
         return self.pos + (self.size/2).Rotate(self.angle)
@@ -132,6 +134,15 @@ class Actor(object):
 
         if friction:
             self.move_speed *= 0.7*(1-(elapsed/1000.0))
+            #There's friction so also make some tracks
+            if globals.time - self.last_track > 10:
+                self.last_track = globals.time
+                quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords('tracks.png'))
+                quad.SetAllVertices(self.vertices, 0.5)
+                if len(self.track_quads) > 1000:
+                    q = self.track_quads.pop(0)
+                    q.Delete()
+
         else:
             self.move_speed *= 0.999*(1-(elapsed/4000.0))
 
@@ -398,6 +409,8 @@ class Robot(Actor):
         self.required_turn = 0
         offset = Point(-(self.width/globals.tile_dimensions.x)*0.6,0)
         self.torch = Torch(self,offset.Rotate(self.angle))
+
+
 
     def setup_info(self):
         #Title in the middle at the top
