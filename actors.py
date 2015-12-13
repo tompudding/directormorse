@@ -313,6 +313,7 @@ class Robot(Actor):
     texture = 'robot'
     width = 16
     height = 16
+    forward_speed = Point( 0.00, 0.04)
     name = 'unknown'
 
     def __init__(self,map,pos):
@@ -328,6 +329,7 @@ class Robot(Actor):
                              ('L<num>' , 'turn left <num>'),
                              ('R<num>' , 'turn right <num>')]
         self.setup_info()
+        self.move_end = None
 
     def setup_info(self):
         #Title in the middle at the top
@@ -363,6 +365,8 @@ class Robot(Actor):
 
 
     def Update(self,t):
+        if self.move_end and t >= self.move_end:
+            self.move_direction = Point(0,0)
         super(Robot,self).Update(t)
         self.light.Update(t)
 
@@ -372,11 +376,23 @@ class Robot(Actor):
     def UnSelect(self):
         self.info.Disable()
 
+    def move_command(self,command,multiplier):
+        print 'Got forward',command
+        try:
+            distance = int(command)
+        except ValueError:
+            globals.game_view.recv_morse.play('IN '+command)
+            return
+        print 'forward distance %d' % distance
+        self.move_direction = self.forward_speed*multiplier
+        self.move_end = globals.time + (distance*600/abs(multiplier))
+        globals.game_view.recv_morse.play('OK')
+
     def forward(self,command):
-        pass
+        self.move_command(command,1)
 
     def back(self,command):
-        pass
+        self.move_command(command,-0.6)
 
     def left(self,command):
         pass
