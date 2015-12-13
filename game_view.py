@@ -139,8 +139,9 @@ class TileTypes:
     LIGHT               = 6
     CRATE               = 7
     ENEMY               = 8
+    TREE                = 9
 
-    Impassable = set()
+    Impassable = set((TREE,))
 
 
 class TileData(object):
@@ -149,8 +150,9 @@ class TileData(object):
                      TileTypes.TILE       : 'tile.png',
                      TileTypes.ACTIVATING_ROBOT : 'snow.png',
                      TileTypes.BASHING_ROBOT : 'snow.png',
+                     TileTypes.TREE       : 'tree.png',
                      TileTypes.CRATE      : 'crate.png',}
-
+    level = 0
     def __init__(self, type, pos, last_type, parent):
         self.pos  = pos
         self.type = type
@@ -159,12 +161,15 @@ class TileData(object):
             self.name = self.texture_names[type]
         except KeyError:
             self.name = self.texture_names[TileTypes.SNOW]
+        #Shitty hack
+        if self.name == 'tree.png':
+            self.name = 'tree_%d.png' % random.randint(0,7)
         #How big are we?
         self.size = ((globals.atlas.TextureSubimage(self.name).size)/globals.tile_dimensions).to_int()
         self.quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords(self.name))
         bl        = pos * globals.tile_dimensions
         tr        = bl + self.size*globals.tile_dimensions
-        self.quad.SetVertices(bl,tr,0)
+        self.quad.SetVertices(bl,tr,self.level)
     def Delete(self):
         self.quad.Delete()
     def Interact(self,robot):
@@ -190,12 +195,23 @@ class LightTile(TileData):
         super(LightTile,self).__init__(last_type,pos,last_type,parent)
         self.light = actors.Light(pos)
 
+class TreeTile(TileData):
+    level = 1
+    def __init__(self, type, pos, last_type, parent):
+        super(TreeTile,self).__init__(type, pos, last_type, parent)
+        self.base = []
+        for x in xrange(self.size.x):
+            for y in xrange(self.size.y):
+                self.base.append(TileData(TileTypes.SNOW, pos + Point(x,y) , last_type, parent))
 
 def TileDataFactory(map,type,pos,last_type,parent):
     #Why don't I just use a dictionary for this?
 
     if type == TileTypes.LIGHT:
         return LightTile(type,pos,last_type,parent)
+
+    elif type == TileTypes.TREE:
+        return TreeTile(type,pos,last_type,parent)
 
     return TileData(type,pos,last_type,parent)
 
@@ -209,6 +225,7 @@ class GameMap(object):
                      'r' : TileTypes.BASHING_ROBOT,
                      'l' : TileTypes.LIGHT,
                      'e' : TileTypes.ENEMY,
+                     'T' : TileTypes.TREE,
                      'C' : TileTypes.CRATE}
 
     def __init__(self,name,parent):
