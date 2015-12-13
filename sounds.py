@@ -16,12 +16,6 @@ class Sounds(object):
             sound.set_volume(0.6)
             name = os.path.basename(filename)
             name = os.path.splitext(name)[0]
-            if name.startswith('talking'):
-                self.talking.append(sound)
-            if name.startswith('player_damage'):
-                self.player_damage.append(sound)
-            if name.startswith('enemy_light'):
-                self.enemy_light.append(sound)
             setattr(self,name,sound)
 
     def stop_talking(self):

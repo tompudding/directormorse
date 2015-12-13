@@ -43,6 +43,7 @@ def main(send,recv):
         globals.sounds                = sounds.Sounds()
         globals.zoom_scale            = None
         globals.time_step             = 0.05
+        globals.wee_played            = False
 
         #WTF?
         globals.mouse_light_quad = drawing.Quad(globals.temp_mouse_light)

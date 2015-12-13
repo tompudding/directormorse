@@ -230,7 +230,7 @@ class Door(TileData):
             #globals.sounds.door.play()
         else:
             self.type = TileTypes.DOOR_CLOSED
-            #globals.sounds.doorclosed.play()
+            globals.sounds.door_clode.play()
         self.quad.SetTextureCoordinates(globals.atlas.TextureSpriteCoords(self.texture_names[self.type]))
 
     def Interact(self,player):

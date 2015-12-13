@@ -145,6 +145,9 @@ class Actor(object):
 
         else:
             self.move_speed *= 0.999*(1-(elapsed/4000.0))
+            if not globals.wee_played:
+                globals.sounds.weee.play()
+                globals.wee_played = True
 
         if self.interacting:
             self.move_speed = Point(0,0)
@@ -560,6 +563,7 @@ class ActivatingRobot(Robot):
                  ('RB',other_robot.mid_point())]
         if other_robot.axe:
             items = items[1:]
+        globals.sounds.scanning.play()
 
         for name,item in items:
             vector = (self.mid_point() - item).Rotate((math.pi*0.5)-self.angle)
@@ -586,6 +590,7 @@ class ActivatingRobot(Robot):
         quad.SetAllVertices(self.vertices, 1 + self.num_marked*0.01)
         self.num_marked += 1
         self.mark_quads.append(quad)
+        globals.sounds.mark.play()
         if len(self.mark_quads) > 100:
             q = self.mark_quads.pop(0)
             q.Delete()
@@ -643,6 +648,7 @@ class BashingRobot(Robot):
         if len(self.dig_quads) > 100:
             q = self.dig_quads.pop(0)
             q.Delete()
+        globals.sounds.dig.play()
 
         axe = self.map.axe_position+Point(0.5,0.5)
         distance = (self.mid_point() - axe).length()
@@ -654,6 +660,7 @@ class BashingRobot(Robot):
     def found_axe(self):
         self.axe = True
         self.axe_quad.Enable()
+        globals.sounds.axe.play()
         self.map.parent.recv_morse.play('AX FND')
 
     def Update(self,t):
@@ -675,6 +682,7 @@ class BashingRobot(Robot):
             return
         self.chop_end = globals.time + self.chop_duration
         #play chop sound
+        globals.sounds.chop.play()
         target = self.mid_point() + (Point(0,1).Rotate(self.angle))
 
         try:
