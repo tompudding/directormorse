@@ -584,7 +584,7 @@ class GameView(ui.RootElement):
             self.command_text.SetText(self.command_stub)
         elif letter:
             self.command.append(letter)
-            self.command_text.SetText(self.command_stub + ''.join(self.command))
+            self.command_text.SetText(self.command_stub + ''.join(self.command).upper())
 
         guess = ''.join(self.morse.guess)
         if guess != self.morse_entry.text:

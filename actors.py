@@ -105,7 +105,10 @@ class Actor(object):
         elapsed = globals.time - self.last_update
         self.last_update = globals.time
 
-        self.set_angle(self.angle + self.angle_speed*elapsed*globals.time_step)
+        angle_change = self.angle_speed*elapsed*globals.time_step
+        if 0 != self.required_turn:
+            self.turned += abs(angle_change)
+        self.set_angle(self.angle + angle_change)
 
         self.move_speed += self.move_direction.Rotate(self.angle)*elapsed*globals.time_step
         self.move_speed *= 0.7*(1-(elapsed/1000.0))
@@ -314,6 +317,7 @@ class Robot(Actor):
     width = 16
     height = 16
     forward_speed = Point( 0.00, 0.04)
+    rotation_speed = 0.04
     name = 'unknown'
 
     def __init__(self,map,pos):
@@ -330,6 +334,9 @@ class Robot(Actor):
                              ('R<num>' , 'turn right <num>')]
         self.setup_info()
         self.move_end = None
+        self.target_angle = self.angle
+        self.turned = 0
+        self.required_turn = 0
 
     def setup_info(self):
         #Title in the middle at the top
@@ -367,6 +374,12 @@ class Robot(Actor):
     def Update(self,t):
         if self.move_end and t >= self.move_end:
             self.move_direction = Point(0,0)
+        if self.turned > self.required_turn:
+            self.angle_speed = 0
+            self.turned = 0
+            self.required_turn = 0
+            self.angle = self.target_angle
+            self.target_angle = 0
         super(Robot,self).Update(t)
         self.light.Update(t)
 
@@ -377,13 +390,11 @@ class Robot(Actor):
         self.info.Disable()
 
     def move_command(self,command,multiplier):
-        print 'Got forward',command
         try:
             distance = int(command)
         except ValueError:
             globals.game_view.recv_morse.play('IN '+command)
             return
-        print 'forward distance %d' % distance
         self.move_direction = self.forward_speed*multiplier
         self.move_end = globals.time + (distance*600/abs(multiplier))
         globals.game_view.recv_morse.play('OK')
@@ -394,11 +405,23 @@ class Robot(Actor):
     def back(self,command):
         self.move_command(command,-0.6)
 
+    def turn_command(self,command,multiplier):
+        try:
+            angle = float(command)*math.pi/180
+        except ValueError:
+            globals.game_view.recv_morse.play('IN '+command)
+            return
+        self.angle_speed = self.rotation_speed*multiplier
+        self.target_angle = (self.angle + angle*multiplier)%(2*math.pi)
+        self.required_turn = angle
+        self.turned = 0
+        globals.game_view.recv_morse.play('OK')
+
     def left(self,command):
-        pass
+        self.turn_command(command,1)
 
     def right(self,command):
-        pass
+        self.turn_command(command,-1)
 
     def execute_command(self,command):
         print 'Got command',command
