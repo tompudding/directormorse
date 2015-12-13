@@ -137,14 +137,22 @@ class TileTypes:
     ACTIVATING_ROBOT    = 4
     BASHING_ROBOT       = 5
     LIGHT               = 6
-    ROCK               = 7
+    ROCK                = 7
     ENEMY               = 8
     TREE                = 9
-    DOOR_CLOSED         = 10,
-    DOOR_OPEN           = 11,
-    ICE                 = 12,
-    CANDY_CANE          = 13,
-    UP_ROCK             = 14,
+    DOOR_CLOSED         = 10
+    DOOR_OPEN           = 11
+    ICE                 = 12
+    CANDY_CANE          = 13
+    UP_ROCK             = 14
+    ICE_RIGHT           = 15
+    ICE_LEFT            = 16
+    ICE_BOTTOM          = 17
+    ICE_TOP             = 18
+    ICE_TOP_RIGHT       = 19
+    ICE_TOP_LEFT        = 20
+    ICE_BOTTOM_LEFT     = 21
+    ICE_BOTTOM_RIGHT    = 22
 
     Impassable = set((WALL,TREE,DOOR_CLOSED,ROCK,CANDY_CANE))
     Doors = set([DOOR_CLOSED, DOOR_OPEN])
@@ -159,6 +167,14 @@ class TileData(object):
                      TileTypes.TILE       : 'tile.png',
                      TileTypes.TREE       : 'tree.png',
                      TileTypes.ICE        : 'ice.png',
+                     TileTypes.ICE_RIGHT   : 'ice_right.png',
+                     TileTypes.ICE_LEFT   : 'ice_left.png',
+                     TileTypes.ICE_TOP   : 'ice_top.png',
+                     TileTypes.ICE_BOTTOM   : 'ice_bottom.png',
+                     TileTypes.ICE_TOP_RIGHT   : 'ice_top_right.png',
+                     TileTypes.ICE_TOP_LEFT   : 'ice_top_left.png',
+                     TileTypes.ICE_BOTTOM_LEFT   : 'ice_bottom_left.png',
+                     TileTypes.ICE_BOTTOM_RIGHT   : 'ice_bottom_right.png',
                      TileTypes.ROCK      : 'rock.png',
                      TileTypes.UP_ROCK   : 'uprock.png',
                      TileTypes.CANDY_CANE : 'candy_cane.png',
@@ -285,6 +301,14 @@ class GameMap(object):
                      'b' : TileTypes.ROCK,
                      'c' : TileTypes.CANDY_CANE,
                      'B' : TileTypes.UP_ROCK,
+                     '1' : TileTypes.ICE_RIGHT,
+                     '2' : TileTypes.ICE_LEFT,
+                     '3' : TileTypes.ICE_TOP,
+                     '4' : TileTypes.ICE_BOTTOM,
+                     '5' : TileTypes.ICE_TOP_RIGHT,
+                     '6' : TileTypes.ICE_TOP_LEFT,
+                     '7' : TileTypes.ICE_BOTTOM_RIGHT,
+                     '8' : TileTypes.ICE_BOTTOM_LEFT,
                      }
 
     def __init__(self,name,parent):
