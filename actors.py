@@ -42,7 +42,7 @@ class Actor(object):
         self.interacting = None
         self.SetPos(pos)
         self.set_angle(3*math.pi/2)
-        self.hand_offset = Point(0,self.size.x*1.1)
+        self.hand_offset = Point(0,self.size.y*1.1)
 
     def mid_point(self):
         return self.pos + (self.size/2).Rotate(self.angle)
@@ -568,12 +568,26 @@ class ActivatingRobot(Robot):
 class BashingRobot(Robot):
     texture = 'robot_blue'
     name = 'Chopper'
+    chop_duration = 300
 
     def __init__(self,map,pos):
+        self.axe = False
         super(BashingRobot,self).__init__(map,pos)
+        self.axe_quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords('axe.png'))
+        self.axe_offset = Point(self.size.x*0.6,self.size.y*0.2)
+        self.axe = True
+        self.axe_angle = 0
         self.dig_quads = []
         self.num_dug = 0
-        self.axe = False
+
+
+    def SetPos(self,pos):
+        super(BashingRobot,self).SetPos(pos)
+        if self.axe:
+            offset = self.axe_offset.Rotate(self.angle)
+            vertices = [(offset + corner).Rotate(self.axe_angle)*globals.tile_dimensions for corner in self.corners_euclid]
+            vertices = [(pos*globals.tile_dimensions + c).to_int() for c in vertices]
+            self.axe_quad.SetAllVertices(vertices, 4.1)
 
     def setup_info(self):
         #Add special commands
@@ -582,7 +596,6 @@ class BashingRobot(Robot):
         self.command_info.append( ('D','Dig for item') )
         self.command_info.append( ('C','Chop with axe') )
         super(BashingRobot,self).setup_info()
-
 
     def dig(self,command):
         #Stick a mark quad exactly where we are
@@ -598,7 +611,21 @@ class BashingRobot(Robot):
         distance = (self.mid_point() - axe).length()
         if distance < 1.5:
             #We found the axe!
-            self.axe = True
+            self.found_axe()
+
+    def found_axe(self):
+        self.axe = True
+        self.axe_quad.Enable()
+        globals.game_view.recv_morse.play('AX FND')
 
     def chop(self,command):
-        pass
+        self.chop_end = globals.time + self.chop_duration
+        #play chop sound
+        target = self.mid_point() + (Point(0,1).Rotate(self.angle))
+        print target
+        try:
+            target_tile = self.map.data[int(target.x)][int(target.y)]
+        except IndexError:
+            return
+        if target_tile.type == game_view.TileTypes.TREE:
+            target_tile.chop_down()

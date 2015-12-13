@@ -224,6 +224,10 @@ class TreeTile(TileData):
             for y in xrange(self.size.y):
                 self.base.append(TileData(TileTypes.SNOW, pos + Point(x,y) , last_type, parent))
 
+    def chop_down(self):
+        self.type = TileTypes.SNOW
+        self.quad.SetTextureCoordinates(globals.atlas.TextureSpriteCoords(self.texture_names[self.type]))
+
 def TileDataFactory(map,type,pos,last_type,parent):
     #Why don't I just use a dictionary for this?
 

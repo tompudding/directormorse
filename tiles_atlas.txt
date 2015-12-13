@@ -12,6 +12,7 @@ resource/sprites/door_closed.png:tiles_atlas_0.png:0:8.0:16:32
 resource/sprites/door_open.png:tiles_atlas_0.png:16:8.0:16:32
 resource/sprites/wall.png:tiles_atlas_0.png:48:48.0:16:16
 resource/sprites/mark.png:tiles_atlas_0.png:64:48.0:16:16
-resource/sprites/dig.png:tiles_atlas_0.png:80:48.0:16:16
-resource/sprites/tile.png:tiles_atlas_0.png:96:48.0:16:16
-resource/sprites/snow.png:tiles_atlas_0.png:112:48.0:16:16
+resource/sprites/axe.png:tiles_atlas_0.png:80:48.0:16:16
+resource/sprites/dig.png:tiles_atlas_0.png:96:48.0:16:16
+resource/sprites/tile.png:tiles_atlas_0.png:112:48.0:16:16
+resource/sprites/snow.png:tiles_atlas_0.png:32:24.0:16:16
