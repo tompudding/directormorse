@@ -264,7 +264,8 @@ class GameMap(object):
             robot = c(self,pos)
             self.robots.append(robot)
             self.actors.append(robot)
-        self.current_robot = self.robots[0]
+        self.current_robot = self.robots[1]
+        self.current_robot.Select()
 
     def AddObject(self,obj):
         self.object_list.append(obj)

@@ -323,10 +323,10 @@ class Robot(Actor):
                          'b' : self.back,
                          'l' : self.left,
                          'r' : self.right}
-        self.command_info = {'F<num>' : 'forward <num> units',
-                             'B<num>' : 'back <num> units',
-                             'L<num>' : 'turn left <num>',
-                             'R<num>' : 'turn right <num>'}
+        self.command_info = [('F<num>' , 'forward <num> units'),
+                             ('B<num>' , 'back <num> units'),
+                             ('L<num>' , 'turn left <num>'),
+                             ('R<num>' , 'turn right <num>')]
         self.setup_info()
 
     def setup_info(self):
@@ -345,25 +345,32 @@ class Robot(Actor):
         num_cols = 1
         margin_height_top = 0.1
         margin_height_bottom = 0.02
-        margin_width  = 0.0
+        margin_width  = -0.045
         height = (1.0-(margin_height_top+margin_height_bottom))/num_rows
         width  = (1.0-2*margin_width)/num_cols
         self.info.commands = []
-        for i,(command,info) in enumerate(self.command_info.iteritems()):
+        for i,(command,info) in enumerate(self.command_info):
             x = margin_width + (i/num_rows)*width
             y = margin_height_bottom + (num_rows - 1 - (i%num_rows))*height
             item = ui.TextBox(parent = self.info,
                               bl = Point(x,y),
                               tr = Point(x+width,y+height),
                               scale=6,
-                              text = '%s : %s' % (command,info),
+                              text = '%s: %s' % (command,info),
                               colour=self.map.parent.text_colour)
             self.info.commands.append(item)
+        self.info.Disable()
 
 
     def Update(self,t):
         super(Robot,self).Update(t)
         self.light.Update(t)
+
+    def Select(self):
+        self.info.Enable()
+
+    def UnSelect(self):
+        self.info.Disable()
 
     def forward(self,command):
         pass
@@ -383,5 +390,39 @@ class Robot(Actor):
 class ActivatingRobot(Robot):
     name = 'Activator'
 
+    def setup_info(self):
+        #Add special commands
+        self.commands['a'] = self.activate
+        self.commands['s'] = self.scan
+        self.command_info.append( ('A','Activate') )
+        self.command_info.append( ('S<angle>','Scan angle in front') )
+        super(ActivatingRobot,self).setup_info()
+
+    def activate(self):
+        pass
+
+    def scan(self):
+        pass
+
 class BashingRobot(Robot):
     name = 'Basher'
+
+    def setup_info(self):
+        #Add special commands
+        self.commands['d'] = self.dig
+        self.commands['h'] = self.hit
+        self.commands['c'] = self.chop
+        self.command_info.append( ('D','Dig for item') )
+        self.command_info.append( ('H','Hit') )
+        self.command_info.append( ('C','Chop with axe') )
+        super(BashingRobot,self).setup_info()
+
+
+    def dig(self):
+        pass
+
+    def hit(self):
+        pass
+
+    def chop(self):
+        pass
