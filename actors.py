@@ -634,7 +634,11 @@ class BashingRobot(Robot):
                 self.finish_chop()
             else:
                 partial = 1 - float(self.chop_end - t)/self.chop_duration
-                self.axe_angle = partial*math.pi*0.5
+                if partial < 0.5:
+                    self.axe_angle = partial*2*math.pi*0.5
+                else:
+                    partial = 1-partial
+                    self.axe_angle = partial*2*math.pi*0.5
         super(BashingRobot,self).Update(t)
 
     def chop(self,command):
