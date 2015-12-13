@@ -98,7 +98,7 @@ class Morse(object):
     DOT_TIME = 180
     DASH_TIME = DOT_TIME*3
     WORD_THRESHOLD = DOT_TIME*7
-    PLAY_DOT_TIME = 80
+    PLAY_DOT_TIME = 60
     PLAY_DASH_TIME = PLAY_DOT_TIME*3
     def __init__(self):
         self.reset()

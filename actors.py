@@ -44,6 +44,9 @@ class Actor(object):
         self.set_angle(3*math.pi/2)
         self.hand_offset = Point(0,self.size.x*1.1)
 
+    def mid_point(self):
+        return self.pos + (self.size/2).Rotate(self.angle)
+
     def RemoveFromMap(self):
         if self.pos != None:
             bl = self.pos.to_int()
@@ -418,14 +421,19 @@ class Robot(Actor):
         self.torch.Update(t)
         if self.move_end and t >= self.move_end:
             self.move_direction = Point(0,0)
+            self.move_end = None
         if self.turned > self.required_turn:
-            self.angle_speed = 0
-            self.turned = 0
-            self.required_turn = 0
-            self.angle = self.target_angle
-            self.target_angle = 0
+            self.done_turn()
+
         super(Robot,self).Update(t)
         self.light.Update(t)
+
+    def done_turn(self):
+        self.angle_speed = 0
+        self.turned = 0
+        self.required_turn = 0
+        self.angle = self.target_angle
+        self.target_angle = 0
 
     def Select(self):
         self.info.Enable()
@@ -440,7 +448,7 @@ class Robot(Actor):
             globals.game_view.recv_morse.play('IN '+command)
             return
         self.move_direction = self.forward_speed*multiplier
-        self.move_end = globals.time + (distance*600/abs(multiplier))
+        self.move_end = globals.time + (distance*530/abs(multiplier))
         globals.game_view.recv_morse.play('OK')
 
     def forward(self,command):
@@ -455,11 +463,15 @@ class Robot(Actor):
         except ValueError:
             globals.game_view.recv_morse.play('IN '+command)
             return
+        self.begin_turn(angle,multiplier)
+        globals.game_view.recv_morse.play('OK')
+
+    def begin_turn(self,angle,multiplier):
         self.angle_speed = self.rotation_speed*multiplier
         self.target_angle = (self.angle + angle*multiplier)%(2*math.pi)
         self.required_turn = angle
         self.turned = 0
-        globals.game_view.recv_morse.play('OK')
+
 
     def left(self,command):
         self.turn_command(command,1)
@@ -482,6 +494,7 @@ class ActivatingRobot(Robot):
 
     def setup_info(self):
         #Add special commands
+        self.scanning = False
         self.commands['a'] = self.activate
         self.commands['s'] = self.scan
         self.command_info.append( ('A','Activate') )
@@ -492,15 +505,46 @@ class ActivatingRobot(Robot):
         #There's a precise and quick way of doing this, but due to not knowing exactly where in a tile we are,
         #and issues about which tile we're pointing into (it might be the same one), we'll take a shitty approach
         #and just loop over all the objects to see if they're close enough to us
+        print self.pos
         for door in self.map.doors:
             distance = (self.hand_pos() - door.mid_point).length()
             if distance < 1:
-                print door,'interact'
                 door.Interact(self)
                 break
 
     def scan(self,command):
-        pass
+        #The scan will find three things:
+        # - The other robot
+        # - The axe
+        # - The candy cane
+        messages = ['SR']
+        self.move_end = globals.time-1
+        for name,item in [('RB',self.map.robots[0].mid_point()),
+                          ('AX',self.map.axe_position+Point(0.5,0.5)),
+                          ('CC',Point(0,0))]:
+            vector = (self.mid_point() - item).Rotate((math.pi*0.5)-self.angle)
+            distance = vector.length()
+            r,a = cmath.polar(vector.x + vector.y*1j)
+            a = (a + math.pi*2)%(math.pi*2)
+            bearing = a*180.0/math.pi
+            #we want it to be clockwise
+            bearing = 360 - bearing
+            distance = r/1.95
+            messages.append('%s DS %d BR %d' % (name,int(distance),int(bearing)))
+        globals.game_view.recv_morse.play('\n'.join(messages))
+
+        self.torch.colour = (0,0,1)
+        self.begin_turn(math.pi*2,1)
+        self.scanning = True
+
+
+    def done_turn(self):
+        super(ActivatingRobot,self).done_turn()
+        if self.scanning:
+            self.torch.colour = (1,1,1)
+            self.scanning = False
+
+
 
 class BashingRobot(Robot):
     name = 'Basher'

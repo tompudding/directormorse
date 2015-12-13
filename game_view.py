@@ -265,6 +265,8 @@ class GameMap(object):
         self.parent = parent
         y = self.size.y - 1
         robot_positions = []
+        self.axe_position = Point(random.randint(16,44),random.randint(34,43))
+        print 'axe at',self.axe_position
         with open(name) as f:
             last = None
             for line in f:
@@ -504,8 +506,6 @@ class GameView(ui.RootElement):
                                        text = self.command_stub,
                                        scale = 10,
                                        colour = self.text_colour)
-
-
 
         self.send_morse_light = ui.ToggleBox(parent = self.bottom_panel,
                                              pos = Point(0.71,0),

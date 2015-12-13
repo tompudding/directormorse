@@ -60,7 +60,6 @@ class Point(object):
     def __hash__(self):
         return (int(self.x) << 16 | int(self.y))
 
-
     def to_float(self):
         return Point(float(self.x),float(self.y))
 
