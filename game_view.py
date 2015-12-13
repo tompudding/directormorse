@@ -137,13 +137,14 @@ class TileTypes:
     ACTIVATING_ROBOT    = 4
     BASHING_ROBOT       = 5
     LIGHT               = 6
-    CRATE               = 7
+    ROCK               = 7
     ENEMY               = 8
     TREE                = 9
     DOOR_CLOSED         = 10,
     DOOR_OPEN           = 11,
+    ICE                 = 12,
 
-    Impassable = set((WALL,TREE,DOOR_CLOSED))
+    Impassable = set((WALL,TREE,DOOR_CLOSED,ROCK))
     Doors = set([DOOR_CLOSED, DOOR_OPEN])
     Robots = set([ACTIVATING_ROBOT, BASHING_ROBOT])
 
@@ -153,7 +154,8 @@ class TileData(object):
                      TileTypes.WALL       : 'wall.png',
                      TileTypes.TILE       : 'tile.png',
                      TileTypes.TREE       : 'tree.png',
-                     TileTypes.CRATE      : 'crate.png',
+                     TileTypes.ICE        : 'ice.png',
+                     TileTypes.ROCK      : 'rock.png',
                      TileTypes.DOOR_CLOSED   : 'door_closed.png',
                      TileTypes.DOOR_OPEN     : 'door_open.png'}
     level = 0
@@ -228,6 +230,20 @@ class TreeTile(TileData):
         self.type = TileTypes.SNOW
         self.quad.SetTextureCoordinates(globals.atlas.TextureSpriteCoords(self.texture_names[self.type]))
 
+class RockTile(TreeTile):
+    level = 1
+    def __init__(self, type, pos, last_type, parent):
+        super(TreeTile,self).__init__(type, pos, last_type, parent)
+        self.base = []
+        for x in xrange(self.size.x):
+            for y in xrange(self.size.y):
+                self.base.append(TileData(TileTypes.SNOW, pos + Point(x,y) , last_type, parent))
+
+    def chop_down(self):
+        return
+
+
+
 def TileDataFactory(map,type,pos,last_type,parent):
     #Why don't I just use a dictionary for this?
 
@@ -239,6 +255,9 @@ def TileDataFactory(map,type,pos,last_type,parent):
 
     elif type == TileTypes.TREE:
         return TreeTile(type,pos,last_type,parent)
+
+    elif type == TileTypes.ROCK:
+        return RockTile(type,pos,last_type,parent)
 
     elif type in TileTypes.Robots:
         return TileData(last_type,pos,last_type,parent)
@@ -256,7 +275,8 @@ class GameMap(object):
                      'l' : TileTypes.LIGHT,
                      'e' : TileTypes.ENEMY,
                      'T' : TileTypes.TREE,
-                     'C' : TileTypes.CRATE}
+                     'i' : TileTypes.ICE,
+                     'b' : TileTypes.ROCK}
 
     def __init__(self,name,parent):
         self.size   = Point(120,50)

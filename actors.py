@@ -526,9 +526,14 @@ class ActivatingRobot(Robot):
         # - The candy cane
         messages = ['SR']
         self.move_end = globals.time-1
-        for name,item in [('RB',self.map.robots[0].mid_point()),
-                          ('AX',self.map.axe_position+Point(0.5,0.5)),
-                          ('CC',Point(0,0))]:
+        other_robot = self.map.robots[0]
+        items = [('AX',self.map.axe_position+Point(0.5,0.5)),
+                 ('CC',Point(0,0)),
+                 ('RB',other_robot.mid_point())]
+        if other_robot.axe:
+            items = items[1:]
+
+        for name,item in items:
             vector = (self.mid_point() - item).Rotate((math.pi*0.5)-self.angle)
             distance = vector.length()
             r,a = cmath.polar(vector.x + vector.y*1j)
@@ -572,6 +577,7 @@ class BashingRobot(Robot):
 
     def __init__(self,map,pos):
         self.axe = False
+        self.chop_end = None
         super(BashingRobot,self).__init__(map,pos)
         self.axe_quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords('axe.png'))
         self.axe_offset = Point(self.size.x*0.6,self.size.y*0.2)
@@ -580,6 +586,8 @@ class BashingRobot(Robot):
         self.axe_angle = 0
         self.dig_quads = []
         self.num_dug = 0
+        #Temp hack for debugging
+        self.found_axe()
 
 
     def SetPos(self,pos):
@@ -618,7 +626,16 @@ class BashingRobot(Robot):
     def found_axe(self):
         self.axe = True
         self.axe_quad.Enable()
-        globals.game_view.recv_morse.play('AX FND')
+        self.map.parent.recv_morse.play('AX FND')
+
+    def Update(self,t):
+        if self.chop_end:
+            if t > self.chop_end:
+                self.finish_chop()
+            else:
+                partial = 1 - float(self.chop_end - t)/self.chop_duration
+                self.axe_angle = partial*math.pi*0.5
+        super(BashingRobot,self).Update(t)
 
     def chop(self,command):
         if not self.axe:
@@ -627,10 +644,17 @@ class BashingRobot(Robot):
         self.chop_end = globals.time + self.chop_duration
         #play chop sound
         target = self.mid_point() + (Point(0,1).Rotate(self.angle))
-        print target
+
         try:
             target_tile = self.map.data[int(target.x)][int(target.y)]
         except IndexError:
+            self.chop_target = None
             return
-        if target_tile.type == game_view.TileTypes.TREE:
-            target_tile.chop_down()
+
+        self.chop_target = target_tile
+
+    def finish_chop(self):
+        if self.chop_target and self.chop_target.type == game_view.TileTypes.TREE:
+            self.chop_target.chop_down()
+        self.chop_target = None
+        self.axe_angle = 0
