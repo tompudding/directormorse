@@ -142,7 +142,7 @@ class GameMode(Mode):
         return False,False
 
 class GameOver(Mode):
-    blurb = "GAME OVER. You died alone on the rogue planet, and plummet through the universe forever :("
+    blurb = "Oh no, you managed to kill your robots somehow"
     def __init__(self,parent):
         self.parent          = parent
         self.blurb           = self.blurb
@@ -214,4 +214,4 @@ class GameOver(Mode):
         return False,False
 
 class GameWin(GameOver):
-    blurb = "You pilot the shuttle back to the ship. Wooo good for you"
+    blurb = "You found the candy! Do the Robot Dance!"

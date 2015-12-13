@@ -143,10 +143,14 @@ class TileTypes:
     DOOR_CLOSED         = 10,
     DOOR_OPEN           = 11,
     ICE                 = 12,
+    CANDY_CANE          = 13,
+    UP_ROCK             = 14,
 
-    Impassable = set((WALL,TREE,DOOR_CLOSED,ROCK))
+    Impassable = set((WALL,TREE,DOOR_CLOSED,ROCK,CANDY_CANE))
     Doors = set([DOOR_CLOSED, DOOR_OPEN])
     Robots = set([ACTIVATING_ROBOT, BASHING_ROBOT])
+    Rocks  = set([ROCK,UP_ROCK])
+    Choppable = set([TREE,CANDY_CANE])
 
 
 class TileData(object):
@@ -156,6 +160,8 @@ class TileData(object):
                      TileTypes.TREE       : 'tree.png',
                      TileTypes.ICE        : 'ice.png',
                      TileTypes.ROCK      : 'rock.png',
+                     TileTypes.UP_ROCK   : 'uprock.png',
+                     TileTypes.CANDY_CANE : 'candy_cane.png',
                      TileTypes.DOOR_CLOSED   : 'door_closed.png',
                      TileTypes.DOOR_OPEN     : 'door_open.png'}
     level = 0
@@ -219,29 +225,26 @@ class LightTile(TileData):
 
 class TreeTile(TileData):
     level = 1
+    base_tile = TileTypes.SNOW
     def __init__(self, type, pos, last_type, parent):
         super(TreeTile,self).__init__(type, pos, last_type, parent)
         self.base = []
         for x in xrange(self.size.x):
             for y in xrange(self.size.y):
-                self.base.append(TileData(TileTypes.SNOW, pos + Point(x,y) , last_type, parent))
+                self.base.append(TileData(self.base_tile, pos + Point(x,y) , last_type, parent))
 
     def chop_down(self):
-        self.type = TileTypes.SNOW
+        self.type = self.base_tile
         self.quad.SetTextureCoordinates(globals.atlas.TextureSpriteCoords(self.texture_names[self.type]))
 
 class RockTile(TreeTile):
-    level = 1
-    def __init__(self, type, pos, last_type, parent):
-        super(TreeTile,self).__init__(type, pos, last_type, parent)
-        self.base = []
-        for x in xrange(self.size.x):
-            for y in xrange(self.size.y):
-                self.base.append(TileData(TileTypes.SNOW, pos + Point(x,y) , last_type, parent))
-
     def chop_down(self):
         return
 
+class CaneTile(TreeTile):
+    base_tile = TileTypes.TILE
+    def chop_down(self):
+        globals.current_view.mode = modes.GameWin(globals.current_view)
 
 
 def TileDataFactory(map,type,pos,last_type,parent):
@@ -253,10 +256,13 @@ def TileDataFactory(map,type,pos,last_type,parent):
     elif type == TileTypes.LIGHT:
         return LightTile(type,pos,last_type,parent)
 
+    elif type == TileTypes.CANDY_CANE:
+        return CaneTile(type,pos,last_type,parent)
+
     elif type == TileTypes.TREE:
         return TreeTile(type,pos,last_type,parent)
 
-    elif type == TileTypes.ROCK:
+    elif type in TileTypes.Rocks:
         return RockTile(type,pos,last_type,parent)
 
     elif type in TileTypes.Robots:
@@ -276,7 +282,10 @@ class GameMap(object):
                      'e' : TileTypes.ENEMY,
                      'T' : TileTypes.TREE,
                      'i' : TileTypes.ICE,
-                     'b' : TileTypes.ROCK}
+                     'b' : TileTypes.ROCK,
+                     'c' : TileTypes.CANDY_CANE,
+                     'B' : TileTypes.UP_ROCK,
+                     }
 
     def __init__(self,name,parent):
         self.size   = Point(120,50)

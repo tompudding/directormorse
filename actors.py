@@ -19,7 +19,7 @@ class Actor(object):
     height  = None
     threshold = 0.01
     initial_health = 100
-    max_speed = 0.1
+    max_speed = 0.25
     max_square_speed = max_speed**2
     def __init__(self,map,pos):
         self.map            = map
@@ -673,7 +673,7 @@ class BashingRobot(Robot):
         self.chop_target = target_tile
 
     def finish_chop(self):
-        if self.chop_target and self.chop_target.type == game_view.TileTypes.TREE:
+        if self.chop_target and self.chop_target.type in game_view.TileTypes.Choppable:
             self.chop_target.chop_down()
         self.chop_target = None
         self.axe_angle = 0
