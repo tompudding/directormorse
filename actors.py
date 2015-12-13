@@ -313,17 +313,75 @@ class Robot(Actor):
     texture = 'robot'
     width = 16
     height = 16
+    name = 'unknown'
 
     def __init__(self,map,pos):
         super(Robot,self).__init__(map,pos)
         self.light = ActorLight(self)
+        self.info_window = self.map.parent.robot_window
+        self.commands = {'f' : self.forward,
+                         'b' : self.back,
+                         'l' : self.left,
+                         'r' : self.right}
+        self.command_info = {'F<num>' : 'forward <num> units',
+                             'B<num>' : 'back <num> units',
+                             'L<num>' : 'turn left <num>',
+                             'R<num>' : 'turn right <num>'}
+        self.setup_info()
+
+    def setup_info(self):
+        #Title in the middle at the top
+        self.info = ui.UIElement(parent=self.info_window,
+                                 pos = Point(0,0),
+                                 tr = Point(1,1))
+        self.info.name = ui.TextBox(parent=self.info,
+                                    bl=Point(0,0.8),
+                                    tr=Point(1,1),
+                                    text=self.name,
+                                    scale=8,
+                                    colour=self.map.parent.text_colour,
+                                    alignment=drawing.texture.TextAlignments.CENTRE)
+        num_rows = 10
+        num_cols = 1
+        margin_height_top = 0.1
+        margin_height_bottom = 0.02
+        margin_width  = 0.0
+        height = (1.0-(margin_height_top+margin_height_bottom))/num_rows
+        width  = (1.0-2*margin_width)/num_cols
+        self.info.commands = []
+        for i,(command,info) in enumerate(self.command_info.iteritems()):
+            x = margin_width + (i/num_rows)*width
+            y = margin_height_bottom + (num_rows - 1 - (i%num_rows))*height
+            item = ui.TextBox(parent = self.info,
+                              bl = Point(x,y),
+                              tr = Point(x+width,y+height),
+                              scale=6,
+                              text = '%s : %s' % (command,info),
+                              colour=self.map.parent.text_colour)
+            self.info.commands.append(item)
+
 
     def Update(self,t):
         super(Robot,self).Update(t)
         self.light.Update(t)
 
-    def morse_key_down(self):
+    def forward(self,command):
         pass
 
-    def morse_key_up(self):
+    def back(self,command):
         pass
+
+    def left(self,command):
+        pass
+
+    def right(self,command):
+        pass
+
+    def execute_command(self,command):
+        pass
+
+class ActivatingRobot(Robot):
+    name = 'Activator'
+
+class BashingRobot(Robot):
+    name = 'Basher'

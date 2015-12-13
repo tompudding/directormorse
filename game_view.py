@@ -134,20 +134,22 @@ class TileTypes:
     SNOW                = 1
     WALL                = 2
     TILE                = 3
-    ROBOT               = 4
-    LIGHT               = 5
-    CRATE               = 6
-    ENEMY               = 7
+    ACTIVATING_ROBOT    = 4
+    BASHING_ROBOT       = 5
+    LIGHT               = 6
+    CRATE               = 7
+    ENEMY               = 8
 
     Impassable = set()
 
 
 class TileData(object):
-    texture_names = {TileTypes.SNOW         : 'snow.png',
-                     TileTypes.WALL          : 'wall.png',
-                     TileTypes.TILE          : 'tile.png',
-                     TileTypes.ROBOT        : 'snow.png',
-                     TileTypes.CRATE         : 'crate.png',}
+    texture_names = {TileTypes.SNOW       : 'snow.png',
+                     TileTypes.WALL       : 'wall.png',
+                     TileTypes.TILE       : 'tile.png',
+                     TileTypes.ACTIVATING_ROBOT : 'snow.png',
+                     TileTypes.BASHING_ROBOT : 'snow.png',
+                     TileTypes.CRATE      : 'crate.png',}
 
     def __init__(self, type, pos, last_type, parent):
         self.pos  = pos
@@ -203,7 +205,8 @@ class GameMap(object):
                      '|' : TileTypes.WALL,
                      '-' : TileTypes.WALL,
                      '+' : TileTypes.WALL,
-                     'R' : TileTypes.ROBOT,
+                     'R' : TileTypes.ACTIVATING_ROBOT,
+                     'r' : TileTypes.BASHING_ROBOT,
                      'l' : TileTypes.LIGHT,
                      'e' : TileTypes.ENEMY,
                      'C' : TileTypes.CRATE}
@@ -244,8 +247,10 @@ class GameMap(object):
                                     self.data[x+tile_x][y+tile_y] = TileTypes.SNOW
                                 if self.data[x+tile_x][y+tile_y] == TileTypes.SNOW:
                                     self.data[x+tile_x][y+tile_y] = td
-                        if self.input_mapping[tile] == TileTypes.ROBOT:
-                            robot_positions.append(Point(x+0.2,y))
+                        if self.input_mapping[tile] == TileTypes.ACTIVATING_ROBOT:
+                            robot_positions.append((Point(x+0.2,y),actors.ActivatingRobot))
+                        if self.input_mapping[tile] == TileTypes.BASHING_ROBOT:
+                            robot_positions.append((Point(x+0.2,y),actors.BashingRobot))
                         if self.input_mapping[tile] == TileTypes.ENEMY:
                             self.parent.enemy_positions.append(Point(x+0.2,y))
                     #except KeyError:
@@ -255,8 +260,8 @@ class GameMap(object):
                     break
         if not robot_positions:
             raise Exception('No robots defined')
-        for pos in robot_positions:
-            robot = actors.Robot(self,pos)
+        for pos,c in robot_positions:
+            robot = c(self,pos)
             self.robots.append(robot)
             self.actors.append(robot)
         self.current_robot = self.robots[0]
@@ -395,8 +400,7 @@ class GameView(ui.RootElement):
         self.enemies = []
         globals.ui_atlas = drawing.texture.TextureAtlas('ui_atlas_0.png','ui_atlas.txt',extra_names=False)
         self.enemy_positions = []
-        self.map = GameMap('level1.txt',self)
-        self.map.world_size = self.map.size * globals.tile_dimensions
+
         self.viewpos = Viewpos(Point(100,200))
         self.game_over = False
         self.mouse_world = Point(0,0)
@@ -407,7 +411,7 @@ class GameView(ui.RootElement):
         #self.music_playing = False
         super(GameView,self).__init__(Point(0,0),globals.screen)
         #skip titles for development of the main game
-        self.mode = modes.GameMode(self)
+
         self.light      = drawing.Quad(globals.light_quads)
         self.light.SetVertices(Point(0,0),
                                globals.screen_abs - Point(0,0),
@@ -507,14 +511,9 @@ class GameView(ui.RootElement):
                                       tr = Point(1,1),
                                       colour=self.text_colour)
 
-        self.send_window = ui.UIElement(parent = self.robot_info,
-                                        pos = Point(0,0.55),
-                                        tr = Point(1,0.7))
-        self.send_window.border = ui.Border(self.send_window,Point(0,0),Point(1,1),colour=self.text_colour,line_width=2)
-
         self.robot_window = ui.UIElement(parent = self.robot_info,
                                         pos = Point(0,0.40),
-                                        tr = Point(1,0.55))
+                                        tr = Point(1,0.7))
         self.robot_window.border = ui.Border(self.robot_window,Point(0,0),Point(1,1),colour=self.text_colour,line_width=2)
 
 
@@ -523,18 +522,18 @@ class GameView(ui.RootElement):
         self.morse.register_light(self.send_morse_light)
         self.recv_morse.register_light(self.receive_morse_light)
 
+        self.map = GameMap('level1.txt',self)
+        self.mode = modes.GameMode(self)
+        self.map.world_size = self.map.size * globals.tile_dimensions
+
         for pos in self.enemy_positions:
             self.enemies.append( actors.Enemy( self.map, pos ) )
 
     def morse_key_down(self):
         self.morse.key_down(globals.time)
-        if self.map.current_robot:
-            self.map.current_robot.morse_key_down()
 
     def morse_key_up(self):
         self.morse.key_up(globals.time)
-        if self.map.current_robot:
-            self.map.current_robot.morse_key_up()
 
     def StartMusic(self):
         pass
@@ -566,7 +565,7 @@ class GameView(ui.RootElement):
             else:
                 self.recv_window.add_letter(r)
         if letter == True: #This indicates the end of a command
-            print ''.join(self.command)
+            self.map.current_robot.execute_command(''.join(self.command))
             self.command = []
             self.command_text.SetText(self.command_stub)
         elif letter:
