@@ -342,7 +342,7 @@ class TimeOfDay(object):
         return (1,3,-5),(0.25,0.25,0.4)
 
 class RecvWindow(ui.UIElement):
-    max_width = 21
+    max_width = 23
     def __init__(self,parent,bl,tr,colour):
         super(RecvWindow,self).__init__(parent,bl,tr)
         self.colour = colour
@@ -350,7 +350,7 @@ class RecvWindow(ui.UIElement):
         num_rows = 10
         self.rows = []
         margin_height = 0.02
-        margin_width  = 0.01
+        margin_width  = -0.05
         height = (1.0-2*margin_height)/num_rows
         self.current_row = 0
         self.row_text = [[] for i in xrange(num_rows)]
