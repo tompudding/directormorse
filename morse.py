@@ -241,9 +241,9 @@ class Morse(object):
         alpha_1 = alphabet[18:][::-1]
         elem.text_items = []
         margin_height = 0.02
-        margin_width  = 0.12
+        margin_width  = 0.01
         height = (1.0-2*margin_height)/18
-        width  = (1.0-2*margin_width)/2
+        width  = (1.0-2*margin_width)/3.4
         elem.border = ui.Border(elem,Point(0,0),Point(1,1),colour=colour,line_width=2)
         for i,alpha in enumerate((alpha_0,alpha_1)):
             for j in xrange(18):
@@ -251,11 +251,42 @@ class Morse(object):
                 y = margin_height+j*height
                 item = ui.TextBox(parent = elem,
                                   bl = Point(x,y),
-                                  tr = Point(x+width,y+height),
+                                  tr = Point(x+width*2,y+height),
                                   scale = 6,
                                   text = '%s : %s' % (alpha[j], english_to_morse[alpha[j]]),
                                   colour=colour)
                 elem.text_items.append(item)
+
+        #Now add the output information on the right
+        info = [('UC','Unknown'),
+                ('','Command'),
+                ('BC','Bad'),
+                ('','Command'),
+                ('IN','Invalid'),
+                ('','Number'),
+                ('SR','Scan'),
+                ('','Results:'),
+                ('ESR','End of'),
+                ('','Scan'),
+                ('','Results'),
+                ('DS','Dstance'),
+                ('BR','Bearing'),
+                ('CC','Candy'),
+                ('','Cane'),
+                ('AX','Axe')]
+
+        for i,(code,meaning) in enumerate(info):
+            text = '%3s: %s' % (code,meaning)
+            y = 17 - i
+            item = ui.TextBox(parent=elem,
+                              bl = Point(width*2,
+                                         margin_height+y*height),
+                              tr = Point(width*4,
+                                         margin_height+(y+1)*height),
+                              scale=6,
+                              text=text,
+                              colour=colour)
+            elem.text_items.append(item)
 
 
 class SoundMorse(Morse):
