@@ -19,6 +19,8 @@ class Actor(object):
     height  = None
     threshold = 0.01
     initial_health = 100
+    max_speed = 0.1
+    max_square_speed = max_speed**2
     def __init__(self,map,pos):
         self.map            = map
         self.tc             = globals.atlas.TextureSpriteCoords('%s.png' % self.texture)
@@ -118,7 +120,20 @@ class Actor(object):
         self.set_angle(self.angle + angle_change)
 
         self.move_speed += self.move_direction.Rotate(self.angle)*elapsed*globals.time_step
-        self.move_speed *= 0.7*(1-(elapsed/1000.0))
+        if self.move_speed.SquareLength() > self.max_square_speed:
+            self.move_speed = self.move_speed.unit_vector() * self.max_speed
+
+        mp = self.mid_point().to_int()
+        try:
+            tile = self.map.data[mp.x][mp.y]
+            friction = False if tile.type == game_view.TileTypes.ICE else True
+        except IndexError:
+            friction = True
+
+        if friction:
+            self.move_speed *= 0.7*(1-(elapsed/1000.0))
+        else:
+            self.move_speed *= 0.999*(1-(elapsed/4000.0))
 
         if self.interacting:
             self.move_speed = Point(0,0)
