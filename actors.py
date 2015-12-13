@@ -492,13 +492,19 @@ class Robot(Actor):
 class ActivatingRobot(Robot):
     name = 'Activator'
 
+    def __init__(self,map,pos):
+        super(ActivatingRobot,self).__init__(map,pos)
+        self.mark_quads = []
+
     def setup_info(self):
         #Add special commands
         self.scanning = False
         self.commands['a'] = self.activate
         self.commands['s'] = self.scan
+        self.commands['m'] = self.mark
         self.command_info.append( ('A','Activate') )
-        self.command_info.append( ('S<angle>','Scan angle in front') )
+        self.command_info.append( ('S','Scan') )
+        self.command_info.append( ('M','Mark') )
         super(ActivatingRobot,self).setup_info()
 
     def activate(self,command=None):
@@ -537,6 +543,14 @@ class ActivatingRobot(Robot):
         self.begin_turn(math.pi*2,1)
         self.scanning = True
 
+    def mark(self,command):
+        #Stick a mark quad exactly where we are
+        quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords('mark.png'))
+        quad.SetAllVertices(self.vertices, 4)
+        self.mark_quads.append(quad)
+        if len(self.mark_quads) > 100:
+            q = self.mark_quads.pop(0)
+            q.Delete()
 
     def done_turn(self):
         super(ActivatingRobot,self).done_turn()
