@@ -475,7 +475,7 @@ class GameView(ui.RootElement):
         self.nightlight.SetVertices(Point(0,0),
                                globals.screen_abs - Point(0,0),
                                0.5)
-        self.timeofday = TimeOfDay(0.33)
+        self.timeofday = TimeOfDay(0.30)
         #self.mode = modes.LevelOne(self)
         self.StartMusic()
         #self.fixed_light = actors.FixedLight( Point(11,38),Point(26,9) )
