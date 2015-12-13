@@ -90,7 +90,7 @@ class Actor(object):
 
 
     def set_angle(self, angle):
-        self.angle = angle
+        self.angle = angle%(2*math.pi)
         self.corners_polar  = [(p.length(),self.angle + ((1+i*2)*math.pi)/4) for i,p in enumerate(self.corners)]
         cnums = [cmath.rect(r,a) for (r,a) in self.corners_polar]
         self.corners_euclid = [Point(c.real,c.imag) for c in cnums]
@@ -311,6 +311,43 @@ class ConeLight(object):
         out =  ((p[0] - globals.game_view.viewpos._pos.x)*globals.scale.x,(p[1]-globals.game_view.viewpos._pos.y)*globals.scale.y,self.z)
         return out
 
+class Torch(ConeLight):
+    def __init__(self,parent,offset):
+        self.quad_buffer = drawing.QuadBuffer(4)
+        self.quad = drawing.Quad(self.quad_buffer)
+        self.shadow_quad = globals.shadow_quadbuffer.NewLight()
+        self.shadow_index = self.shadow_quad.shadow_index
+        self.parent = parent
+        self.last_update    = None
+        self.colour = (1,1,1)
+        self.angle = 0.0
+        self.offset = cmath.polar(offset.x + offset.y*1j)
+        self.angle_width = 0.7
+        self.on = True
+        globals.cone_lights.append(self)
+
+    @property
+    def world_pos(self):
+        offset = cmath.rect(self.offset[0],self.offset[1]+self.parent.angle)
+        pos = (self.parent.pos + Point(offset.real,offset.imag))
+        return (pos.x,pos.y,self.z)
+
+    @property
+    def pos(self):
+        offset = cmath.rect(self.offset[0],self.offset[1]+self.parent.angle)
+        pos = (self.parent.pos + Point(offset.real,offset.imag))*globals.tile_dimensions
+        return (pos.x,pos.y,self.z)
+
+    def Update(self,t):
+        self.angle = (self.parent.angle + math.pi*0.5)%(2*math.pi)
+        box = (globals.tile_scale*Point(self.width,self.height))
+        bl = Point(*self.pos[:2]) - box*0.5
+        tr = bl + box
+        bl = bl.to_int()
+        tr = tr.to_int()
+        self.quad.SetVertices(bl,tr,4)
+        #self.quad.SetAllVertices(self.parent.vertices, 0)
+
 
 class Robot(Actor):
     texture = 'robot'
@@ -337,6 +374,8 @@ class Robot(Actor):
         self.target_angle = self.angle
         self.turned = 0
         self.required_turn = 0
+        offset = Point(-(self.width/globals.tile_dimensions.x)*0.6,0)
+        self.torch = Torch(self,offset.Rotate(self.angle))
 
     def setup_info(self):
         #Title in the middle at the top
@@ -372,6 +411,7 @@ class Robot(Actor):
 
 
     def Update(self,t):
+        self.torch.Update(t)
         if self.move_end and t >= self.move_end:
             self.move_direction = Point(0,0)
         if self.turned > self.required_turn:
