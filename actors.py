@@ -495,6 +495,7 @@ class ActivatingRobot(Robot):
     def __init__(self,map,pos):
         super(ActivatingRobot,self).__init__(map,pos)
         self.mark_quads = []
+        self.num_marked = 0
 
     def setup_info(self):
         #Add special commands
@@ -536,7 +537,10 @@ class ActivatingRobot(Robot):
             #we want it to be clockwise
             bearing = 360 - bearing
             distance = r/1.95
-            messages.append('%s DS %d BR %d' % (name,int(distance),int(bearing)))
+            message = '%s DS %d BR %d' % (name,int(distance),int(bearing))
+            if name == 'AX':
+                print message
+            messages.append(message)
         globals.game_view.recv_morse.play('\n'.join(messages))
 
         self.torch.colour = (0,0,1)
@@ -546,7 +550,8 @@ class ActivatingRobot(Robot):
     def mark(self,command):
         #Stick a mark quad exactly where we are
         quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords('mark.png'))
-        quad.SetAllVertices(self.vertices, 4)
+        quad.SetAllVertices(self.vertices, 1 + self.num_marked*0.01)
+        self.num_marked += 1
         self.mark_quads.append(quad)
         if len(self.mark_quads) > 100:
             q = self.mark_quads.pop(0)
@@ -561,24 +566,35 @@ class ActivatingRobot(Robot):
 
 
 class BashingRobot(Robot):
-    name = 'Basher'
+    name = 'Chopper'
+
+    def __init__(self,map,pos):
+        super(BashingRobot,self).__init__(map,pos)
+        self.dig_quads = []
+        self.num_dug = 0
 
     def setup_info(self):
         #Add special commands
         self.commands['d'] = self.dig
-        self.commands['h'] = self.hit
         self.commands['c'] = self.chop
         self.command_info.append( ('D','Dig for item') )
-        self.command_info.append( ('H','Hit') )
         self.command_info.append( ('C','Chop with axe') )
         super(BashingRobot,self).setup_info()
 
 
     def dig(self,command):
-        pass
+        #Stick a mark quad exactly where we are
+        quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords('dig.png'))
+        quad.SetAllVertices(self.vertices, 1.1 + self.num_dug*0.01)
+        self.num_dug += 1
+        self.dig_quads.append(quad)
+        if len(self.dig_quads) > 100:
+            q = self.dig_quads.pop(0)
+            q.Delete()
 
-    def hit(self,command):
-        pass
+        axe = self.map.axe_position+Point(0.5,0.5)
+        distance = (self.mid_point() - axe).length()
+        print distance
 
     def chop(self,command):
         pass
