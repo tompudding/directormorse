@@ -336,7 +336,7 @@ class TimeOfDay(object):
         return (1,3,-5),(0.25,0.25,0.4)
 
 class RecvWindow(ui.UIElement):
-    max_width = 13
+    max_width = 21
     def __init__(self,parent,bl,tr,colour):
         super(RecvWindow,self).__init__(parent,bl,tr)
         self.colour = colour
@@ -356,6 +356,15 @@ class RecvWindow(ui.UIElement):
                              scale = 8,
                              colour = self.colour)
             self.rows.insert(0,row)
+
+        self.add_message('Mission: Find large\ncandy source\nTab to switch robot\n>')
+
+    def add_message(self,message):
+        for letter in message:
+            if letter == '\n':
+                self.new_line()
+            else:
+                self.add_letter(letter)
 
     def new_line(self):
         if self.current_row < len(self.rows) - 1:
@@ -381,7 +390,7 @@ class GameView(ui.RootElement):
     def __init__(self, send_morse, recv_morse):
         self.morse = send_morse
         self.recv_morse = recv_morse
-        self.recv_morse.play('Any key to morse. Command robot, find candy\n--------------')
+        self.recv_morse.play('Any key to key\n>')
         self.atlas = globals.atlas = drawing.texture.TextureAtlas('tiles_atlas_0.png','tiles_atlas.txt')
         self.enemies = []
         globals.ui_atlas = drawing.texture.TextureAtlas('ui_atlas_0.png','ui_atlas.txt',extra_names=False)
@@ -484,7 +493,7 @@ class GameView(ui.RootElement):
         self.morse.register_bars(self.letter_bar, self.word_bar)
 
         self.robot_info = ui.Box(parent = globals.screen_root,
-                                 pos = Point(0.8,0.08),
+                                 pos = Point(0.7,0.08),
                                  tr = Point(1,1),
                                  colour = (0,0,0,0.8))
 

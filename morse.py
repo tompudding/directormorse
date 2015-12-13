@@ -38,7 +38,7 @@ english_to_morse = {
         '2': '..---',           '?': '..--..',
         '3': '...--',           ';': '-.-.-.',
         '4': '....-',           ':': '---...',
-        '5': '.....',           "'": '.----.',
+        '5': '.....',           ">": '.----.',
         '6': '-....',           '-': '-....-',
         '7': '--...',           '/': '-..-.',
         '8': '---..',           '(': '-.--.-',
@@ -241,7 +241,7 @@ class Morse(object):
         alpha_1 = alphabet[18:][::-1]
         elem.text_items = []
         margin_height = 0.02
-        margin_width  = 0.02
+        margin_width  = 0.12
         height = (1.0-2*margin_height)/18
         width  = (1.0-2*margin_width)/2
         elem.border = ui.Border(elem,Point(0,0),Point(1,1),colour=colour,line_width=2)
