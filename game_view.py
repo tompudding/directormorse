@@ -169,7 +169,9 @@ class TileData(object):
         if self.name == 'tree.png':
             self.name = 'tree_%d.png' % random.randint(0,7)
         #How big are we?
-        self.size = ((globals.atlas.TextureSubimage(self.name).size)/globals.tile_dimensions).to_int()
+        self.size = (globals.atlas.TextureSubimage(self.name).size)/globals.tile_dimensions
+        self.mid_point = self.pos + (self.size/2)
+        self.size = self.size.to_int()
         self.quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords(self.name))
         bl        = pos * globals.tile_dimensions
         tr        = bl + self.size*globals.tile_dimensions
@@ -203,7 +205,7 @@ class Door(TileData):
             #globals.sounds.doorclosed.play()
         self.quad.SetTextureCoordinates(globals.atlas.TextureSpriteCoords(self.texture_names[self.type]))
 
-    def Activate(self,player):
+    def Interact(self,player):
         self.Toggle()
 
 
@@ -278,6 +280,8 @@ class GameMap(object):
                     if 1:
                         #hack, also give the adjacent tile so we know what kind of background to put it on...
                         td = TileDataFactory(self,self.input_mapping[tile],Point(x,y),last,parent)
+                        if td.type in TileTypes.Doors:
+                            self.doors.append(td)
                         last = self.input_mapping[tile]
                         for tile_x in xrange(td.size.x):
                             for tile_y in xrange(td.size.y):

@@ -109,7 +109,7 @@ class GameMode(Mode):
             elif key in self.direction_amounts:
                 self.keydownmap[self.keyflags[key]] = input_key
                 self.parent.map.current_robot.move_direction += self.direction_amounts[key]
-        elif key == pygame.K_TAB:
+        elif key in [pygame.K_TAB,pygame.K_SPACE]:
             pass
         else:
             self.parent.morse_key_down()
@@ -127,6 +127,9 @@ class GameMode(Mode):
                 self.parent.map.current_robot.move_direction -= self.direction_amounts[key]
         elif key == pygame.K_TAB:
             self.parent.next_robot()
+        elif key == pygame.K_SPACE:
+            if hasattr(self.parent.map.current_robot,'activate'):
+                self.parent.map.current_robot.activate()
         else:
             self.parent.morse_key_up()
 

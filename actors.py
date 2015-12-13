@@ -42,6 +42,7 @@ class Actor(object):
         self.interacting = None
         self.SetPos(pos)
         self.set_angle(3*math.pi/2)
+        self.hand_offset = Point(0,self.size.x*1.1)
 
     def RemoveFromMap(self):
         if self.pos != None:
@@ -97,6 +98,9 @@ class Actor(object):
 
     def Update(self,t):
         self.Move(t)
+
+    def hand_pos(self):
+        return self.pos + self.hand_offset.Rotate(self.angle)
 
     def Move(self,t):
         if self.last_update == None:
@@ -484,10 +488,18 @@ class ActivatingRobot(Robot):
         self.command_info.append( ('S<angle>','Scan angle in front') )
         super(ActivatingRobot,self).setup_info()
 
-    def activate(self):
-        pass
+    def activate(self,command=None):
+        #There's a precise and quick way of doing this, but due to not knowing exactly where in a tile we are,
+        #and issues about which tile we're pointing into (it might be the same one), we'll take a shitty approach
+        #and just loop over all the objects to see if they're close enough to us
+        for door in self.map.doors:
+            distance = (self.hand_pos() - door.mid_point).length()
+            if distance < 1:
+                print door,'interact'
+                door.Interact(self)
+                break
 
-    def scan(self):
+    def scan(self,command):
         pass
 
 class BashingRobot(Robot):
@@ -504,11 +516,11 @@ class BashingRobot(Robot):
         super(BashingRobot,self).setup_info()
 
 
-    def dig(self):
+    def dig(self,command):
         pass
 
-    def hit(self):
+    def hit(self,command):
         pass
 
-    def chop(self):
+    def chop(self,command):
         pass
