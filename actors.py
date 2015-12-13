@@ -575,7 +575,8 @@ class BashingRobot(Robot):
         super(BashingRobot,self).__init__(map,pos)
         self.axe_quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords('axe.png'))
         self.axe_offset = Point(self.size.x*0.6,self.size.y*0.2)
-        self.axe = True
+        self.axe = False
+        self.axe_quad.Disable()
         self.axe_angle = 0
         self.dig_quads = []
         self.num_dug = 0
@@ -609,7 +610,8 @@ class BashingRobot(Robot):
 
         axe = self.map.axe_position+Point(0.5,0.5)
         distance = (self.mid_point() - axe).length()
-        if distance < 1.5:
+        print 'dig distance',distance
+        if distance < 5:
             #We found the axe!
             self.found_axe()
 
@@ -619,6 +621,9 @@ class BashingRobot(Robot):
         globals.game_view.recv_morse.play('AX FND')
 
     def chop(self,command):
+        if not self.axe:
+            globals.game_view.recv_morse.play('NO AX')
+            return
         self.chop_end = globals.time + self.chop_duration
         #play chop sound
         target = self.mid_point() + (Point(0,1).Rotate(self.angle))
