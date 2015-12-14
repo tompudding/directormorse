@@ -100,7 +100,7 @@ class GameMode(Mode):
 
     def KeyDown(self,input_key):
         key = input_key
-        if key in self.keyflags:
+        if 0 and key in self.keyflags:
             if self.keyflags[key] in self.keydownmap:
                 return
             if key in self.angle_amounts:
@@ -116,7 +116,7 @@ class GameMode(Mode):
 
     def KeyUp(self,input_key):
         key = input_key
-        if key in self.keyflags:
+        if 0 and key in self.keyflags:
             if self.keyflags[key] not in self.keydownmap:
                 return
             if key in self.angle_amounts and (self.keydownmap[self.keyflags[key]] == input_key):
