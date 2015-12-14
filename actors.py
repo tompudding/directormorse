@@ -453,6 +453,7 @@ class Robot(Actor):
         if self.move_end and t >= self.move_end:
             self.move_direction = Point(0,0)
             self.move_end = None
+            globals.sounds.move.fadeout(100)
         if self.turned > self.required_turn:
             self.done_turn()
 
@@ -480,6 +481,7 @@ class Robot(Actor):
             return
         self.move_direction = self.forward_speed*multiplier
         self.move_end = globals.time + (distance*530/abs(multiplier))
+        globals.sounds.move.play()
         globals.game_view.recv_morse.play('OK')
 
     def forward(self,command):
@@ -502,6 +504,7 @@ class Robot(Actor):
         self.target_angle = (self.angle + angle*multiplier)%(2*math.pi)
         self.required_turn = angle
         self.turned = 0
+        globals.sounds.move.play()
 
 
     def left(self,command):
@@ -557,6 +560,7 @@ class ActivatingRobot(Robot):
         # - The candy cane
         messages = ['SR']
         self.move_end = globals.time-1
+        globals.sounds.move.fadeout(100)
         other_robot = self.map.robots[0]
         items = [('AX',self.map.axe_position+Point(0.5,0.5)),
                  ('CC',self.map.candy.mid_point),
@@ -597,6 +601,7 @@ class ActivatingRobot(Robot):
 
     def done_turn(self):
         super(ActivatingRobot,self).done_turn()
+        globals.sounds.move.fadeout(100)
         if self.scanning:
             self.torch.colour = (1,1,1)
             self.scanning = False

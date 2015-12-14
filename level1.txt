@@ -12,8 +12,8 @@ T T       T T                   l              +-             T T B
 
 T T  l    T T                                                 T T B
 
-T T  R    T T                                                 T T B
-
+T T       T T                                                 T T B
+      R
 T T       T T                                                 T T B
 
 T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T T B
