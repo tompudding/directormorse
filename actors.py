@@ -296,6 +296,27 @@ class ActorLight(object):
     def pos(self):
         return (self.parent.pos.x*globals.tile_dimensions.x,self.parent.pos.y*globals.tile_dimensions.y,self.z)
 
+class MorseLight(object):
+    z = 6
+    def __init__(self,parent,colour):
+        self.parent = parent
+        self.quad_buffer = drawing.QuadBuffer(4)
+        self.quad = drawing.Quad(self.quad_buffer)
+        self.colour = colour
+        self.radius = 60
+        self.intensity = 1
+        self.on = True
+        globals.non_shadow_lights.append(self)
+
+    def Update(self,t):
+        self.vertices = [((self.parent.pos + corner*3)*globals.tile_dimensions).to_int() for corner in self.parent.corners_euclid]
+        self.quad.SetAllVertices(self.vertices, 0)
+
+    @property
+    def pos(self):
+        return (self.parent.pos.x*globals.tile_dimensions.x,self.parent.pos.y*globals.tile_dimensions.y,self.z)
+
+
 class FixedLight(object):
     z = 6
     def __init__(self,pos,size):
@@ -396,6 +417,8 @@ class Robot(Actor):
     def __init__(self,map,pos):
         super(Robot,self).__init__(map,pos)
         self.light = ActorLight(self)
+        self.morse_light = MorseLight(self,self.morse_colour)
+        self.morse_light.on = False
         self.info_window = self.map.parent.robot_window
         self.commands = {'f' : self.forward,
                          'b' : self.back,
@@ -459,6 +482,7 @@ class Robot(Actor):
 
         super(Robot,self).Update(t)
         self.light.Update(t)
+        self.morse_light.Update(t)
 
     def done_turn(self):
         self.angle_speed = 0
@@ -477,12 +501,12 @@ class Robot(Actor):
         try:
             distance = int(command)
         except ValueError:
-            globals.game_view.recv_morse.play('IN '+command)
+            globals.game_view.recv_morse.play('IN '+command, self.morse_light)
             return
         self.move_direction = self.forward_speed*multiplier
         self.move_end = globals.time + (distance*530/abs(multiplier))
         globals.sounds.move.play()
-        globals.game_view.recv_morse.play('OK')
+        globals.game_view.recv_morse.play('OK', self.morse_light)
 
     def forward(self,command):
         self.move_command(command,1)
@@ -494,10 +518,10 @@ class Robot(Actor):
         try:
             angle = float(command)*math.pi/180
         except ValueError:
-            globals.game_view.recv_morse.play('IN '+command)
+            globals.game_view.recv_morse.play('IN '+command, self.morse_light)
             return
         self.begin_turn(angle,multiplier)
-        globals.game_view.recv_morse.play('OK')
+        globals.game_view.recv_morse.play('OK', self.morse_light)
 
     def begin_turn(self,angle,multiplier):
         self.angle_speed = self.rotation_speed*multiplier
@@ -520,11 +544,12 @@ class Robot(Actor):
         try:
             self.commands[command_name](command_data)
         except KeyError:
-            globals.game_view.recv_morse.play('UC '+command_name)
+            globals.game_view.recv_morse.play('UC '+command_name, self.morse_light)
 
 
 class ActivatingRobot(Robot):
     name = 'Activator'
+    morse_colour = (1,1,0)
 
     def __init__(self,map,pos):
         super(ActivatingRobot,self).__init__(map,pos)
@@ -582,7 +607,7 @@ class ActivatingRobot(Robot):
             if name == 'AX':
                 print message
             messages.append(message)
-        globals.game_view.recv_morse.play('\n'.join(messages))
+        globals.game_view.recv_morse.play('\n'.join(messages), self.morse_light)
 
         self.torch.colour = (0,0,1)
         self.begin_turn(math.pi*2,1)
@@ -607,11 +632,11 @@ class ActivatingRobot(Robot):
             self.scanning = False
 
 
-
 class BashingRobot(Robot):
     texture = 'robot_blue'
     name = 'Chopper'
     chop_duration = 300
+    morse_colour = (1,1,0)
 
     def __init__(self,map,pos):
         self.axe = False
@@ -668,7 +693,7 @@ class BashingRobot(Robot):
         self.axe = True
         self.axe_quad.Enable()
         globals.sounds.axe.play()
-        self.map.parent.recv_morse.play('AX FND')
+        self.map.parent.recv_morse.play('AX FND', self.morse_light)
 
     def Update(self,t):
         if self.chop_end:
@@ -685,7 +710,7 @@ class BashingRobot(Robot):
 
     def chop(self,command):
         if not self.axe:
-            globals.game_view.recv_morse.play('NO AX')
+            globals.game_view.recv_morse.play('NO AX', self.morse_light)
             return
         self.chop_end = globals.time + self.chop_duration
         #play chop sound

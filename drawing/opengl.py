@@ -451,6 +451,8 @@ def EndFrameGameMode():
 
     glUniform1i(light_shader.locations.light_type, 3)
     for light in globals.non_shadow_lights:
+        if not light.on:
+            continue
         glUniform3f(light_shader.locations.light_pos, *light.pos)
         glUniform3f(light_shader.locations.light_colour, *light.colour)
         glUniform1f(light_shader.locations.light_radius, light.radius)

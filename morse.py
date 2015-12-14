@@ -101,6 +101,7 @@ class Morse(object):
     PLAY_DOT_TIME = 60
     PLAY_DASH_TIME = PLAY_DOT_TIME*3
     def __init__(self):
+        self.morse_light = None
         self.reset()
 
     def register_bars(self, letter_bar, word_bar):
@@ -114,11 +115,15 @@ class Morse(object):
         self.last_on = t
         self.set_letter_bar(1)
         self.light.TurnOn()
+        if self.morse_light:
+            self.morse_light.on = True
 
     def key_up(self, t):
         if self.last_on is None:
             return
         self.light.TurnOff()
+        if self.morse_light:
+            self.morse_light.on = False
         duration = t - self.last_on
         self.on_times.append( (self.last_on, duration) )
         if duration < self.DOT_TIME:
@@ -148,6 +153,7 @@ class Morse(object):
         self.play_sequence = None
         self.letter_bar = None
         self.word_bar = None
+        self.morse_light = None
 
     def playback(self, t):
         if self.play_sequence is None:
@@ -222,7 +228,8 @@ class Morse(object):
                 partial = float(diff) / self.WORD_THRESHOLD
                 self.set_word_bar(partial)
 
-    def play(self, message):
+    def play(self, message, morse_light=None):
+        self.morse_light = morse_light
         if not message.endswith('\n>'):
             message += '\n>'
         if self.play_sequence:
