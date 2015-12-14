@@ -227,10 +227,10 @@ class Door(TileData):
     def Toggle(self):
         if self.type == TileTypes.DOOR_CLOSED:
             self.type = TileTypes.DOOR_OPEN
-            #globals.sounds.door.play()
+            globals.sounds.door_open.play()
         else:
             self.type = TileTypes.DOOR_CLOSED
-            globals.sounds.door_clode.play()
+            globals.sounds.door_close.play()
         self.quad.SetTextureCoordinates(globals.atlas.TextureSpriteCoords(self.texture_names[self.type]))
 
     def Interact(self,player):
@@ -263,7 +263,10 @@ class RockTile(TreeTile):
 
 class CaneTile(TreeTile):
     base_tile = TileTypes.TILE
+
     def chop_down(self):
+        globals.sounds.chop.stop()
+        globals.sounds.robot_dance.play()
         globals.current_view.mode = modes.GameWin(globals.current_view)
 
 
@@ -277,7 +280,8 @@ def TileDataFactory(map,type,pos,last_type,parent):
         return LightTile(type,pos,last_type,parent)
 
     elif type == TileTypes.CANDY_CANE:
-        return CaneTile(type,pos,last_type,parent)
+        map.candy = CaneTile(type,pos,last_type,parent)
+        return map.candy
 
     elif type == TileTypes.TREE:
         return TreeTile(type,pos,last_type,parent)

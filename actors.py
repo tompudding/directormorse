@@ -559,7 +559,7 @@ class ActivatingRobot(Robot):
         self.move_end = globals.time-1
         other_robot = self.map.robots[0]
         items = [('AX',self.map.axe_position+Point(0.5,0.5)),
-                 ('CC',Point(0,0)),
+                 ('CC',self.map.candy.mid_point),
                  ('RB',other_robot.mid_point())]
         if other_robot.axe:
             items = items[1:]
@@ -620,7 +620,7 @@ class BashingRobot(Robot):
         self.dig_quads = []
         self.num_dug = 0
         #Temp hack for debugging
-        #self.found_axe()
+        self.found_axe()
 
 
     def SetPos(self,pos):
@@ -648,7 +648,7 @@ class BashingRobot(Robot):
         if len(self.dig_quads) > 100:
             q = self.dig_quads.pop(0)
             q.Delete()
-        globals.sounds.dig.play()
+
 
         axe = self.map.axe_position+Point(0.5,0.5)
         distance = (self.mid_point() - axe).length()
@@ -656,6 +656,8 @@ class BashingRobot(Robot):
         if distance < 5:
             #We found the axe!
             self.found_axe()
+        else:
+            globals.sounds.dig.play()
 
     def found_axe(self):
         self.axe = True
