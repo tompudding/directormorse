@@ -19,6 +19,7 @@ def main(send,recv):
         globals.tile_scale            = Point(1,1)
         globals.scale                 = Point(2,2)
         globals.screen_abs            = Point(w,h)
+        globals.music_volume = 0.1
         globals.screen                = globals.screen_abs/globals.scale
         globals.screen_root           = ui.UIRoot(Point(0,0),globals.screen_abs)
         globals.mouse_screen          = Point(0,0)

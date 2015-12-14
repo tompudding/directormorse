@@ -531,8 +531,8 @@ class GameView(ui.RootElement):
         self.mouse_pos = Point(0,0)
         self.command_stub = 'Command:'
         self.command = []
-        #pygame.mixer.music.load('music.ogg')
-        #self.music_playing = False
+        pygame.mixer.music.load('music.ogg')
+        self.music_playing = False
         super(GameView,self).__init__(Point(0,0),globals.screen)
         #skip titles for development of the main game
 
@@ -658,11 +658,11 @@ class GameView(ui.RootElement):
         self.morse.key_up(globals.time)
 
     def StartMusic(self):
-        pass
         #globals.sounds.stop_talking()
         #globals.sounds.talking_intro.play()
-        #pygame.mixer.music.play(-1)
-        #self.music_playing = True
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(globals.music_volume)
+        self.music_playing = True
 
     def remove_enemy(self,to_remove):
         self.enemies = [enemy for enemy in self.enemies if enemy is not to_remove]
@@ -740,7 +740,7 @@ class GameView(ui.RootElement):
                 pygame.mixer.music.set_volume(0)
             else:
                 self.music_playing = True
-                pygame.mixer.music.set_volume(1)
+                pygame.mixer.music.set_volume(globals.music_volume)
         self.mode.KeyUp(key)
 
     def MouseMotion(self,pos,rel,handled):
