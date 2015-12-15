@@ -671,7 +671,7 @@ class GameView(ui.RootElement):
         drawing.ResetState()
         drawing.Translate(-self.viewpos.pos.x,-self.viewpos.pos.y,0)
         drawing.DrawAll(globals.quad_buffer,self.atlas.texture)
-        drawing.DrawAll(globals.nonstatic_text_buffer,globals.text_manager.atlas.texture)
+        #drawing.DrawAll(globals.nonstatic_text_buffer,globals.text_manager.atlas.texture)
 
     def Update(self,t):
         if self.mode:

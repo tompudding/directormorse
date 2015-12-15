@@ -135,10 +135,11 @@ class Actor(object):
         if friction:
             self.move_speed *= 0.7*(1-(elapsed/1000.0))
             #There's friction so also make some tracks
-            if globals.time - self.last_track > 10:
+            if globals.time - self.last_track > 10 and self.move_speed.SquareLength() > 0.001 or abs(angle_change) > 0.001:
                 self.last_track = globals.time
                 quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords('tracks.png'))
                 quad.SetAllVertices(self.vertices, 0.5)
+                self.track_quads.append(quad)
                 if len(self.track_quads) > 1000:
                     q = self.track_quads.pop(0)
                     q.Delete()

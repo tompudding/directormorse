@@ -28,10 +28,10 @@ def main(send,recv):
         globals.non_shadow_lights     = []
         globals.uniform_lights        = []
 
-        globals.quad_buffer           = drawing.QuadBuffer(131072)
-        globals.screen_texture_buffer = drawing.QuadBuffer(131072, ui=True)
-        globals.ui_buffer             = drawing.QuadBuffer(131072, ui=True)
-        globals.nonstatic_text_buffer = drawing.QuadBuffer(131072, ui=True)
+        globals.quad_buffer           = drawing.QuadBuffer(16384)
+        globals.screen_texture_buffer = drawing.QuadBuffer(256, ui=True)
+        globals.ui_buffer             = drawing.QuadBuffer(1024, ui=True)
+        #globals.nonstatic_text_buffer = drawing.QuadBuffer(131072, ui=True)
         globals.light_quads           = drawing.QuadBuffer(16384)
         globals.nightlight_quads      = drawing.QuadBuffer(16)
         globals.temp_mouse_light      = drawing.QuadBuffer(16)
