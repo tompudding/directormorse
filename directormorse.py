@@ -43,7 +43,7 @@ def main(send,recv):
         globals.tile_dimensions       = Point(16,16)*globals.tile_scale
         globals.sounds                = sounds.Sounds()
         globals.zoom_scale            = None
-        globals.time_step             = 0.05
+        globals.time_step             = 0.02
         globals.wee_played            = False
 
         #WTF?

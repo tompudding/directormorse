@@ -80,8 +80,8 @@ class GameMode(Mode):
     speed = 10
     angle_amounts = {pygame.K_LEFT  : 0.01*speed,
                      pygame.K_RIGHT : -0.01*speed}
-    direction_amounts = {pygame.K_UP    : Point( 0.00, 0.01*speed),
-                         pygame.K_DOWN  : Point( 0.00,-0.01*speed)}
+    direction_amounts = {pygame.K_UP    : Point( 0.00, 10*speed),
+                         pygame.K_DOWN  : Point( 0.00,-10*speed)}
     class KeyFlags:
         LEFT  = 1
         RIGHT = 2

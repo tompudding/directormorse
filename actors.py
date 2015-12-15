@@ -128,13 +128,26 @@ class Actor(object):
         mp = self.mid_point().to_int()
         try:
             tile = self.map.data[mp.x][mp.y]
-            friction = False if tile.type == game_view.TileTypes.ICE else True
+            if tile.type == game_view.TileTypes.ICE:
+                friction = 0.002*globals.time_step*elapsed
+                if not globals.wee_played:
+                    globals.sounds.weee.play()
+                    globals.wee_played = True
+            else:
+                friction = 0.05*globals.time_step*elapsed
+
         except IndexError:
-            friction = True
+            friction = 0.05*globals.time_step*elapsed
 
         if friction:
-            self.move_speed *= 0.7*(1-(elapsed/1000.0))
-            #There's friction so also make some tracks
+            friction = self.move_speed.unit_vector()*friction
+            if friction.SquareLength() < self.move_speed.SquareLength():
+            #self.move_speed *= 0.7*(1-(elapsed/1000.0))
+                self.move_speed -= friction
+            else:
+                self.move_speed = Point(0,0)
+
+        if tile.type != game_view.TileTypes.ICE:#There's friction so also make some tracks
             if globals.time - self.last_track > 10 and self.move_speed.SquareLength() > 0.001 or abs(angle_change) > 0.001:
                 self.last_track = globals.time
                 quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords('tracks.png'))
@@ -143,12 +156,6 @@ class Actor(object):
                 if len(self.track_quads) > 1000:
                     q = self.track_quads.pop(0)
                     q.Delete()
-
-        else:
-            self.move_speed *= 0.999*(1-(elapsed/4000.0))
-            if not globals.wee_played:
-                globals.sounds.weee.play()
-                globals.wee_played = True
 
         if self.interacting:
             self.move_speed = Point(0,0)
@@ -411,7 +418,7 @@ class Robot(Actor):
     texture = 'robot'
     width = 24
     height = 24
-    forward_speed = Point( 0.00, 0.04)
+    forward_speed = Point( 0.00, 0.1)
     rotation_speed = 0.04
     name = 'unknown'
 
@@ -436,8 +443,6 @@ class Robot(Actor):
         self.required_turn = 0
         offset = Point(-(self.width/globals.tile_dimensions.x)*0.6,0)
         self.torch = Torch(self,offset.Rotate(self.angle))
-
-
 
     def setup_info(self):
         #Title in the middle at the top
@@ -477,6 +482,7 @@ class Robot(Actor):
         if self.move_end and t >= self.move_end:
             self.move_direction = Point(0,0)
             self.move_end = None
+            print 'moved to',self.pos
             globals.sounds.move.fadeout(100)
         if self.turned > self.required_turn:
             self.done_turn()
@@ -505,9 +511,10 @@ class Robot(Actor):
             globals.game_view.recv_morse.play('IN '+command, self.morse_light)
             return
         self.move_direction = self.forward_speed*multiplier
-        self.move_end = globals.time + (distance*530/abs(multiplier))
+        self.move_end = globals.time + (distance*420/abs(multiplier))
         globals.sounds.move.play()
         globals.game_view.recv_morse.play('OK', self.morse_light)
+        print 'start at',self.pos
 
     def forward(self,command):
         self.move_command(command,1)
@@ -516,6 +523,12 @@ class Robot(Actor):
         self.move_command(command,-0.6)
 
     def turn_command(self,command,multiplier):
+        try:
+            command = abs(int(command))
+        except ValueError:
+            return
+        if command == 0:
+            return
         try:
             angle = float(command)*math.pi/180
         except ValueError:
