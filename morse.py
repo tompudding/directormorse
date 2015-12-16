@@ -94,7 +94,7 @@ class Player(object):
 
 
 class Morse(object):
-    LETTER_THRESHOLD = 400
+    LETTER_THRESHOLD = 2000
     DOT_TIME = 180
     DASH_TIME = DOT_TIME*3
     WORD_THRESHOLD = DOT_TIME*7
@@ -133,7 +133,8 @@ class Morse(object):
         sys.stdout.flush()
         self.last_on = None
 
-    def process(self, t):
+    def process(self):
+        t = globals.time
         try:
             out = morse_to_english[''.join(self.guess)]
         except KeyError:
@@ -188,6 +189,16 @@ class Morse(object):
         if self.letter_bar:
             self.letter_bar.SetBarLevel(level)
 
+    def forming_letter(self):
+        if self.on_times:
+            return True
+        else:
+            return False
+
+    def finish_letter(self):
+        self.set_letter_bar(0)
+        return self.process()
+
     def update(self, t):
         r = self.playback(t)
         if r or r is None:
@@ -208,25 +219,6 @@ class Morse(object):
             last_on,duration = self.on_times[-1]
             last_off = last_on + duration
             duration = t - last_off
-            self.set_word_bar(1)
-            if duration > self.LETTER_THRESHOLD:
-                self.set_letter_bar(0)
-                return self.process(t)
-            else:
-                diff = self.LETTER_THRESHOLD-duration
-                partial = float(diff) / self.LETTER_THRESHOLD
-                self.set_letter_bar(partial)
-        if self.last_on is None and not self.on_times and self.last_processed is not None:
-            #It's off and there's nothing in the bank...
-            duration = t - self.last_processed
-            self.set_letter_bar(0)
-            if duration > self.WORD_THRESHOLD:
-                self.last_processed = None
-                return True
-            else:
-                diff = self.WORD_THRESHOLD-duration
-                partial = float(diff) / self.WORD_THRESHOLD
-                self.set_word_bar(partial)
 
     def play(self, message, morse_light=None):
         self.morse_light = morse_light

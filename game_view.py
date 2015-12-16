@@ -265,6 +265,12 @@ class CaneTile(TreeTile):
     base_tile = TileTypes.TILE
 
     def chop_down(self):
+        self.win()
+
+    def Interact(self, other):
+        self.win()
+
+    def win(self):
         globals.sounds.chop.stop()
         globals.sounds.robot_dance.play()
         globals.current_view.mode = modes.GameWin(globals.current_view)
@@ -349,7 +355,7 @@ class GameMap(object):
                     if 1:
                         #hack, also give the adjacent tile so we know what kind of background to put it on...
                         td = TileDataFactory(self,self.input_mapping[tile],Point(x,y),last,parent)
-                        if td.type in TileTypes.Doors:
+                        if td.type in TileTypes.Doors or td.type == TileTypes.CANDY_CANE:
                             self.doors.append(td)
                         last = self.input_mapping[tile]
                         for tile_x in xrange(td.size.x):
@@ -514,6 +520,11 @@ class RecvWindow(ui.UIElement):
         text.append(k)
         row.SetText(''.join(text))
 
+class TabStates:
+    FORMING_LETTER = 0
+    FORMING_WORD   = 1
+    SWITCH_ROBOT   = 2
+
 
 class GameView(ui.RootElement):
     def __init__(self, send_morse, recv_morse):
@@ -590,33 +601,23 @@ class GameView(ui.RootElement):
         self.letter_left = ui.TextBox(parent = self.bottom_panel,
                                       bl = Point(0.8,0.5),
                                       tr = Point(1,0.85),
-                                      text = 'Letter:',
+                                      text = 'Press TAB to:',
                                       scale = 6,
-                                      colour = self.text_colour)
-        self.letter_bar = ui.PowerBar(parent = self.bottom_panel,
-                                      pos = Point(0.9,0.55),
-                                      tr  = Point(0.99,0.95),
-                                      level = 1.0,
-                                      bar_colours=barColours,
-                                      border_colour=self.text_colour)
+                                      colour = self.text_colour,
+                                      alignment = drawing.texture.TextAlignments.CENTRE)
 
 
-        self.word_left = ui.TextBox(parent = self.bottom_panel,
-                                      bl = Point(0.8,0),
-                                      tr = Point(1,0.35),
-                                      text = ' Word :',
-                                      scale = 6,
-                                      colour = self.text_colour)
-        self.word_bar = ui.PowerBar(parent = self.bottom_panel,
-                                      pos = Point(0.9,0.05),
-                                      tr  = Point(0.99,0.45),
-                                      level = 1.0,
-                                      bar_colours=barColours,
-                                      border_colour=self.text_colour)
 
-        self.letter_bar.SetBarLevel(0)
-        self.word_bar.SetBarLevel(0)
-        self.morse.register_bars(self.letter_bar, self.word_bar)
+        self.tab_action = ui.TextBox(parent = self.bottom_panel,
+                                     bl = Point(0.8,0),
+                                     tr = Point(1,0.35),
+                                     text = 'Switch Robot',
+                                     scale = 6,
+                                     colour = self.text_colour,
+                                     alignment = drawing.texture.TextAlignments.CENTRE)
+        self.tab_state = TabStates.SWITCH_ROBOT
+
+
 
         self.robot_info = ui.Box(parent = globals.screen_root,
                                  pos = Point(0.7,0.08),
@@ -673,15 +674,46 @@ class GameView(ui.RootElement):
         drawing.DrawAll(globals.quad_buffer,self.atlas.texture)
         #drawing.DrawAll(globals.nonstatic_text_buffer,globals.text_manager.atlas.texture)
 
+    def send_command(self):
+        self.map.current_robot.execute_command(''.join(self.command))
+        self.command = []
+        self.command_text.SetText(self.command_stub)
+
+    def tab_key(self):
+        if self.morse.forming_letter():
+            letter = self.morse.finish_letter()
+            if letter == 4:
+                letter = True
+            if letter and letter != True:
+                self.command.append(letter)
+                self.command_text.SetText(self.command_stub + ''.join(self.command).upper())
+
+        elif self.command:
+            self.send_command()
+        else:
+            self.next_robot()
+
     def Update(self,t):
         if self.mode:
             self.mode.Update(t)
 
         if self.game_over:
             return
-        letter = self.morse.update(t)
-        if letter == 4:
-            letter = True
+        self.morse.update(t)
+
+        print self.morse.forming_letter()
+        if self.morse.forming_letter():
+            if self.tab_state != TabStates.FORMING_LETTER:
+                self.tab_action.SetText('Finish Letter')
+                self.tab_state = TabStates.FORMING_LETTER
+        elif self.command:
+            if self.tab_state != TabStates.FORMING_WORD:
+                self.tab_action.SetText('Send Command')
+                self.tab_state = TabStates.FORMING_WORD
+        elif self.tab_state != TabStates.SWITCH_ROBOT:
+            self.tab_action.SetText('Switch Robot')
+            self.tab_state = TabStates.SWITCH_ROBOT
+
         r = self.recv_morse.update(t)
         if r:
             if r == True or r == '\n':
@@ -691,13 +723,8 @@ class GameView(ui.RootElement):
                 pass
             else:
                 self.recv_window.add_letter(r)
-        if letter == True: #This indicates the end of a command
-            self.map.current_robot.execute_command(''.join(self.command))
-            self.command = []
-            self.command_text.SetText(self.command_stub)
-        elif letter:
-            self.command.append(letter)
-            self.command_text.SetText(self.command_stub + ''.join(self.command).upper())
+
+
 
         guess = ''.join(self.morse.guess)
         if guess != self.morse_entry.text:

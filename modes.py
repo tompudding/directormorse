@@ -126,7 +126,8 @@ class GameMode(Mode):
                 del self.keydownmap[self.keyflags[key]]
                 self.parent.map.current_robot.move_direction -= self.direction_amounts[key]
         elif key == pygame.K_TAB:
-            self.parent.next_robot()
+            self.parent.tab_key()
+
 
         elif key == pygame.K_SPACE:
             if hasattr(self.parent.map.current_robot,'activate'):
