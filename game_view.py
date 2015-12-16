@@ -701,7 +701,6 @@ class GameView(ui.RootElement):
             return
         self.morse.update(t)
 
-        print self.morse.forming_letter()
         if self.morse.forming_letter():
             if self.tab_state != TabStates.FORMING_LETTER:
                 self.tab_action.SetText('Finish Letter')
