@@ -113,15 +113,15 @@ class Actor(object):
         if self.last_update == None:
             self.last_update = globals.time
             return
-        elapsed = globals.time - self.last_update
+        elapsed = (globals.time - self.last_update)*globals.time_step
         self.last_update = globals.time
 
-        angle_change = self.angle_speed*elapsed*globals.time_step
+        angle_change = self.angle_speed*elapsed
         if 0 != self.required_turn:
             self.turned += abs(angle_change)
         self.set_angle(self.angle + angle_change)
 
-        self.move_speed += self.move_direction.Rotate(self.angle)*elapsed*globals.time_step
+        self.move_speed += self.move_direction.Rotate(self.angle)*elapsed
         if self.move_speed.SquareLength() > self.max_square_speed:
             self.move_speed = self.move_speed.unit_vector() * self.max_speed
 
@@ -129,15 +129,15 @@ class Actor(object):
         try:
             tile = self.map.data[mp.x][mp.y]
             if tile.type == game_view.TileTypes.ICE:
-                friction = 0.002*globals.time_step*elapsed
+                friction = 0.002*elapsed
                 if not globals.wee_played:
                     globals.sounds.weee.play()
                     globals.wee_played = True
             else:
-                friction = 0.05*globals.time_step*elapsed
+                friction = 0.05*elapsed
 
         except IndexError:
-            friction = 0.05*globals.time_step*elapsed
+            friction = 0.05*elapsed
 
         if friction:
             friction = self.move_speed.unit_vector()*friction
@@ -153,14 +153,14 @@ class Actor(object):
                 quad = drawing.Quad(globals.quad_buffer,tc = globals.atlas.TextureSpriteCoords('tracks.png'))
                 quad.SetAllVertices(self.vertices, 0.5)
                 self.track_quads.append(quad)
-                if len(self.track_quads) > 1000:
+                if len(self.track_quads) > 10000:
                     q = self.track_quads.pop(0)
                     q.Delete()
 
         if self.interacting:
             self.move_speed = Point(0,0)
 
-        amount = Point(self.move_speed.x*elapsed*globals.time_step,self.move_speed.y*elapsed*globals.time_step)
+        amount = Point(self.move_speed.x*elapsed,self.move_speed.y*elapsed)
 
         bl = self.pos.to_int()
         tr = (self.pos+self.size).to_int()
