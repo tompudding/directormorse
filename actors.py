@@ -160,7 +160,7 @@ class Actor(object):
         if self.interacting:
             self.move_speed = Point(0,0)
 
-        amount = Point(self.move_speed.x*elapsed,self.move_speed.y*elapsed)
+        amount = self.move_speed * elapsed 
 
         bl = self.pos.to_int()
         tr = (self.pos+self.size).to_int()
