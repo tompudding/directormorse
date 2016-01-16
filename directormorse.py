@@ -14,7 +14,7 @@ def main(send,recv):
 
     def Init():
         """Initialise everything. Run once on startup"""
-        #w,h = (1600,1200)
+        #w,h = (1600,1000)
         w,h = (1280,720)
         globals.tile_scale            = Point(1,1)
         globals.scale                 = Point(2,2)

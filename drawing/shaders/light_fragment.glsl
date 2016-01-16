@@ -21,6 +21,7 @@ uniform vec2 translation;
 uniform vec2 scale;
 #define NUM_VALUES 4
 float values[NUM_VALUES] = float[](0.05,0.09,0.12,0.15);
+//float values[NUM_VALUES] = float[](0.05,0.07,0.09,0.105,0.12,0.13,0.15);
 
 out vec4 out_colour;
 
@@ -56,7 +57,8 @@ void main()
         //out_colour = mix(out_colour,displacement,1);
         //out_colour = colour;
         //out_colour = vec4(normal.xyz,1);
-        //out_colour = shadow;
+
+        //out_colour = texture(shadow_map, tex_coord);
     }
     else if(2 == light_type){
         //this is one for testing that follows the mouse
@@ -65,7 +67,8 @@ void main()
         float theta_diff = theta - cone_dir;
         float r = length(adjust_xy)*0.95;
         float coord = (PI-theta) / (2.0*PI);
-        float jim = (shadow_index*3)/256.0;
+        float factor = shadow_index;
+        float jim = (factor+0.5)/screen_dimensions.y;
         vec2 tc = vec2(coord,jim);
         float centre = sample(tc,r);
         float blur = 0.003;//(1/256.)*smoothstep(0.,1.,r);

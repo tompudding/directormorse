@@ -71,10 +71,12 @@ class GeometryBuffer(object):
 class ShadowMapBuffer(GeometryBuffer):
     TEXTURE_TYPE_SHADOW = 0
     NUM_TEXTURES        = 1
-    WIDTH               = 1024
-    HEIGHT              = 256
+    #WIDTH               = 1024
+    #HEIGHT              = 256
 
     def __init__(self):
+        self.WIDTH = globals.screen_abs.x
+        self.HEIGHT = globals.screen_abs.y
         super(ShadowMapBuffer,self).__init__(self.WIDTH,self.HEIGHT)
 
     def InitBound(self,width,height):
@@ -357,12 +359,12 @@ def EndFrameGameMode():
     quad_buffer = globals.shadow_quadbuffer
     glEnableVertexAttribArray( shadow_shader.locations.vertex_data );
     glVertexAttribPointer( shadow_shader.locations.vertex_data, 3, GL_FLOAT, GL_FALSE, 0, quad_buffer.vertex_data )
-    glDrawElements(GL_QUADS,4,GL_UNSIGNED_INT,quad_buffer.indices)
+    #glDrawElements(GL_QUADS,4,GL_UNSIGNED_INT,quad_buffer.indices)
 
     #Now do the other lights with shadows
     for light in itertools.chain(globals.lights,globals.cone_lights):
         glUniform2f(shadow_shader.locations.light_pos, *light.screen_pos[:2])
-        glVertexAttribPointer( shadow_shader.locations.vertex_data, 3, GL_FLOAT, GL_FALSE, 0, quad_buffer.vertex_data )
+        #glVertexAttribPointer( shadow_shader.locations.vertex_data, 3, GL_FLOAT, GL_FALSE, 0, quad_buffer.vertex_data )
         glDrawElements(GL_QUADS,4,GL_UNSIGNED_INT,quad_buffer.indices[light.shadow_index*4:])
 
     #return
@@ -376,7 +378,7 @@ def EndFrameGameMode():
     glUniform1f(light_shader.locations.light_radius, 400)
     glUniform1f(light_shader.locations.light_intensity, 1)
 
-    quad_buffer = globals.temp_mouse_light
+    #quad_buffer = globals.temp_mouse_light
 
     #Hack, do the mouse light separate for now so we can set it's position. Should be done elsewhere really and be in
     #the lights list
@@ -489,7 +491,7 @@ def InitDrawing():
     glUniform1i(shadow_shader.locations.normal_map  , gbuffer.TEXTURE_TYPE_NORMAL)
     glUniform1i(shadow_shader.locations.occlude_map  , gbuffer.TEXTURE_TYPE_OCCLUDE)
     glUniform3f(shadow_shader.locations.screen_dimensions, globals.screen_abs.x, globals.screen_abs.y, z_max)
-    glUniform3f(shadow_shader.locations.sb_dimensions, ShadowMapBuffer.WIDTH, ShadowMapBuffer.HEIGHT, 1)
+    glUniform3f(shadow_shader.locations.sb_dimensions, globals.screen_abs.x, globals.screen_abs.y, 1)
     glUniform2f(shadow_shader.locations.light_dimensions, 256, 256)
     light_shader.Use()
     glUniform1i(light_shader.locations.displacement_map, gbuffer.TEXTURE_TYPE_DISPLACEMENT)

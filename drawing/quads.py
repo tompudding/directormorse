@@ -1,5 +1,6 @@
 import numpy
 import drawing
+import globals
 from globals.types import Point
 from drawing.opengl import GL_QUADS
 from drawing.opengl import GL_LINES
@@ -87,7 +88,7 @@ class ShadowQuadBuffer(QuadBuffer):
         light = Quad(self)
         #Now set the vertices for the next line ...
         bl = Point(0,row)
-        tr = Point(drawing.opengl.ShadowMapBuffer.WIDTH,(row+1))
+        tr = Point(globals.screen_abs.x,(row+1))
         print bl,':',tr
         #bl = Point(0,0)
         #tr = Point(drawing.opengl.ShadowMapBuffer.WIDTH,drawing.opengl.ShadowMapBuffer.HEIGHT)
