@@ -102,7 +102,6 @@ class Viewpos(object):
                 return
             target = fpos - (globals.screen*Point(0.35,0.46)).to_int()
             diff = target - self._pos
-            #print diff.SquareLength(),self.follow_threshold
             direction = diff.direction()
 
             if abs(diff.x) < self.max_away.x and abs(diff.y) < self.max_away.y:
@@ -339,7 +338,6 @@ class GameMap(object):
         y = self.size.y - 1
         robot_positions = []
         self.axe_position = Point(random.randint(16,44),random.randint(34,43))
-        print 'axe at',self.axe_position
         with open(name) as f:
             last = None
             for line in f:
@@ -716,7 +714,6 @@ class GameView(ui.RootElement):
         r = self.recv_morse.update(t)
         if r:
             if r == True or r == '\n':
-                print 'newline'
                 self.recv_window.new_line()
             elif r == 4:
                 pass

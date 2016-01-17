@@ -24,7 +24,6 @@ class GeometryBuffer(object):
 
     def __init__(self,width,height):
         self.fbo = glGenFramebuffers(1)
-        print 'fbo',self.fbo
         self.BindForWriting()
         try:
             self.InitBound(width,height)
@@ -355,7 +354,6 @@ def EndFrameGameMode():
 
     #do the mouse light
     glUniform2f(shadow_shader.locations.light_pos, *(globals.mouse_screen))
-    #print globals.mouse_screen.to_float()/globals.screen
     quad_buffer = globals.shadow_quadbuffer
     glEnableVertexAttribArray( shadow_shader.locations.vertex_data );
     glVertexAttribPointer( shadow_shader.locations.vertex_data, 3, GL_FLOAT, GL_FALSE, 0, quad_buffer.vertex_data )

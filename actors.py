@@ -174,7 +174,6 @@ class Actor(object):
                         if distance.SquareLength() < self.radius_square + actor.radius_square:
                             overlap = self.radius + actor.radius - distance.length()
                             adjust = distance.unit_vector()*-overlap
-                            #print type(self),self.radius,actor.radius,distance.length(),overlap,adjust
                             amount += adjust*0.1
                             self.TriggerCollide(actor)
                             #We've hit, so move us away from it's centre by the overlap
@@ -482,7 +481,6 @@ class Robot(Actor):
         if self.move_end and t >= self.move_end:
             self.move_direction = Point(0,0)
             self.move_end = None
-            print 'moved to',self.pos
             globals.sounds.move.fadeout(100)
         if self.turned > self.required_turn:
             self.done_turn()
@@ -514,7 +512,6 @@ class Robot(Actor):
         self.move_end = globals.time + (distance*420/abs(multiplier))
         globals.sounds.move.play()
         globals.game_view.recv_morse.play('OK', self.morse_light)
-        print 'start at',self.pos
 
     def forward(self,command):
         self.move_command(command,1)
@@ -552,7 +549,6 @@ class Robot(Actor):
         self.turn_command(command,-1)
 
     def execute_command(self,command):
-        print 'Got command',command
         command = command.lower()
         command_name,command_data = command[:1],command[1:]
         try:
@@ -585,7 +581,6 @@ class ActivatingRobot(Robot):
         #There's a precise and quick way of doing this, but due to not knowing exactly where in a tile we are,
         #and issues about which tile we're pointing into (it might be the same one), we'll take a shitty approach
         #and just loop over all the objects to see if they're close enough to us
-        print self.pos
         for door in self.map.doors:
             distance = (self.hand_pos() - door.mid_point).length()
             if distance < 1:
@@ -618,8 +613,6 @@ class ActivatingRobot(Robot):
             bearing = 360 - bearing
             distance = r/1.95
             message = '%s DS %d BR %d' % (name,int(distance),int(bearing))
-            if name == 'AX':
-                print message
             messages.append(message)
         globals.game_view.recv_morse.play('\n'.join(messages), self.morse_light)
 
@@ -696,7 +689,6 @@ class BashingRobot(Robot):
 
         axe = self.map.axe_position+Point(0.5,0.5)
         distance = (self.mid_point() - axe).length()
-        print 'dig distance',distance
         if distance < 5:
             #We found the axe!
             self.found_axe()
