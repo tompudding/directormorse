@@ -66,7 +66,7 @@ class Viewpos(object):
         self.follow_locked = False
 
     def HasTarget(self):
-        return self.target != None
+        return self.target is not None
 
     def Skip(self):
         self._pos = self.target

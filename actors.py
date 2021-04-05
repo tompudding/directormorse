@@ -52,7 +52,7 @@ class Actor(object):
         return self.pos + (self.size/2).Rotate(self.angle)
 
     def RemoveFromMap(self):
-        if self.pos != None:
+        if self.pos is not None:
             bl = self.pos.to_int()
             tr = (self.pos+self.size).to_int()
             for x in xrange(bl.x,tr.x+1):

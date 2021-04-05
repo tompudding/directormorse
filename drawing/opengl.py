@@ -188,9 +188,9 @@ class State(object):
             pos = self.pos
         if scale == None:
             scale = self.scale
-        if self.shader.locations.translation != None:
+        if self.shader.locations.translation is not None:
             glUniform2f(self.shader.locations.translation, pos.x, pos.y)
-        if self.shader.locations.scale != None:
+        if self.shader.locations.scale is not None:
             glUniform2f(self.shader.locations.scale, scale.x, scale.y)
 
 class UIBuffers(object):
@@ -203,7 +203,7 @@ class UIBuffers(object):
             local_state = (state.pos,state.scale)
         else:
             local_state = None
-        if texture != None:
+        if texture is not None:
             self.buffers.append( ((quad_buffer,texture,default_shader),local_state,DrawAllNow) )
         else:
             self.buffers.append( ((quad_buffer,default_shader),local_state,DrawNoTextureNow) )
