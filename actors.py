@@ -110,7 +110,7 @@ class Actor(object):
         return self.pos + self.hand_offset.Rotate(self.angle)
 
     def Move(self,t):
-        if self.last_update == None:
+        if self.last_update is None:
             self.last_update = globals.time
             return
         elapsed = (globals.time - self.last_update)*globals.time_step

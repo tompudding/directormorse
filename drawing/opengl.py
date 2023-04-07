@@ -138,7 +138,7 @@ class ShaderData(object):
         vertex_name,fragment_name = (os.path.join('drawing','shaders','%s_%s.glsl' % (name,typeof)) for typeof in ('vertex','fragment'))
         codes = []
         for name in vertex_name,fragment_name:
-            with open(name,'rb') as f:
+            with open(globals.pyinst.path(name),'rb') as f:
                 data = f.read()
             codes.append(data)
         VERTEX_SHADER   = shaders.compileShader(codes[0]  , GL_VERTEX_SHADER)
@@ -184,9 +184,9 @@ class State(object):
         self.Update()
 
     def Update(self,pos = None, scale = None):
-        if pos == None:
+        if pos is None:
             pos = self.pos
-        if scale == None:
+        if scale is None:
             scale = self.scale
         if self.shader.locations.translation is not None:
             glUniform2f(self.shader.locations.translation, pos.x, pos.y)

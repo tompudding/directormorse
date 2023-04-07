@@ -168,7 +168,7 @@ class FallingItem(object):
     def Update(self):
         if self.dead:
             return False
-        if self.last_update == None:
+        if self.last_update is None:
             self.last_update = globals.time
             return True
         elapsed = globals.time - self.last_update
@@ -221,7 +221,7 @@ class GameOver(Mode):
         #pygame.mixer.music.play(-1)
 
     def Update(self,t):
-        if self.start == None:
+        if self.start is None:
             self.start = t
         for item in self.falling_items:
             item.Update()

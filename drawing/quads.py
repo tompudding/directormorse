@@ -130,7 +130,7 @@ class Shape(object):
     """
 
     def __init__(self,source,vertex = None,tc = None,colour_info = None,index = None):
-        if index == None:
+        if index is None:
             self.index = source.next()
         else:
             self.index = index
@@ -162,7 +162,7 @@ class Shape(object):
         """
         if self.deleted:
             return
-        if self.old_vertices == None:
+        if self.old_vertices is None:
             self.old_vertices = numpy.copy(self.vertex[0:self.num_points])
             for i in xrange(self.num_points):
                 self.vertex[i] = (0,0,0)

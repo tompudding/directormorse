@@ -458,7 +458,7 @@ class HoverableBox(Box,HoverableElement):
 class TextBox(UIElement):
     """ A Screen-relative text box wraps text to a given size """
     def __init__(self,parent,bl,tr,text,scale,colour = None,textType = drawing.texture.TextTypes.SCREEN_RELATIVE,alignment = drawing.texture.TextAlignments.LEFT):
-        if tr == None:
+        if tr is None:
             #If we're given no tr; just set it to one row of text, as wide as it can get without overflowing
             #the parent
             self.shrink_to_fit = True
@@ -598,7 +598,7 @@ class TextBox(UIElement):
     def SetText(self,text,colour = None):
         """Update the text"""
         enabled = self.enabled
-        if colour == None:
+        if colour is None:
             colour = self.colour
         self.Delete()
         if enabled:
@@ -643,7 +643,7 @@ class TextBox(UIElement):
         super(TextBox,self).Enable()
 
     def EnableChars(self,num = None):
-        if num == None:
+        if num is None:
             num = len(self.quads)
         if num < self.current_enabled:
             for quad in self.quads[num:]:
@@ -1090,12 +1090,12 @@ class Slider(UIElement):
 class ImageBox(Box):
     def __init__(self,parent,pos,tr,tc,buffer=None,level = None):
         super(Box,self).__init__(parent,pos,tr)
-        if buffer == None:
+        if buffer is None:
             buffer = globals.ui_texture_buffer
 
         self.quad = drawing.Quad(buffer)
         self.tc = tc
-        self.extra_level = 0 if level == None else level
+        self.extra_level = 0 if level is None else level
         self.quad.SetVertices(self.absolute.bottom_left,
                               self.absolute.top_right,
                               self.level + self.extra_level)
